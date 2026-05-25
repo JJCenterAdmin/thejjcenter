@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The JJ Center, Inc. — Using Food as Your Medicine</title>
+  <meta name="description" content="The JJ Center Food Pantry serves Ward 8, Washington DC. Led by Dr. Mary A. Roach, PharmD. Free food, no limits, no barriers — every week at the park.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green-deep: #1a4a2e;
+      --green-mid: #2d7a4f;
+      --green-bright: #3da066;
+      --green-light: #d4edd9;
+      --cream: #faf6ef;
+      --warm-white: #fffdf8;
+      --gold: #c8922a;
+      --gold-light: #f5d98a;
+      --text-dark: #1a1a14;
+      --text-mid: #3d3d30;
+      --text-light: #6b6b56;
+      --red-alert: #c0392b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--warm-white);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(250,246,239,0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(45,122,79,0.12);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+    .nav-logo img {
+      height: 44px; width: 44px; object-fit: contain; border-radius: 6px;
+    }
+    .nav-logo-text { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--green-deep); line-height: 1.2; }
+    .nav-logo-text span { display: block; font-size: 11px; font-family: 'DM Sans', sans-serif; color: var(--text-light); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-links a { font-size: 14px; color: var(--text-mid); text-decoration: none; font-weight: 500; letter-spacing: 0.02em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--green-mid); }
+    .nav-cta {
+      background: var(--green-mid); color: white !important;
+      padding: 10px 22px; border-radius: 100px;
+      font-size: 14px !important; font-weight: 600 !important;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+    .nav-cta:hover { background: var(--green-deep) !important; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--green-deep);
+      display: grid; grid-template-columns: 1fr 1fr;
+      position: relative; overflow: hidden;
+      padding-top: 80px;
+    }
+    .hero-bg-pattern {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 20% 50%, rgba(61,160,102,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(200,146,42,0.1) 0%, transparent 40%);
+    }
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 56px 80px 80px;
+      position: relative; z-index: 2;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(61,160,102,0.2); border: 1px solid rgba(61,160,102,0.4);
+      color: var(--green-light); padding: 6px 14px; border-radius: 100px;
+      font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
+      margin-bottom: 28px; width: fit-content;
+    }
+    .hero-tag::before { content: '●'; color: var(--green-bright); font-size: 8px; }
+    .hero-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1.1; color: white;
+      margin-bottom: 12px;
+    }
+    .hero-headline em { color: var(--gold-light); font-style: italic; }
+    .hero-subhead {
+      font-size: 18px; color: rgba(255,255,255,0.7);
+      font-style: italic; font-family: 'Playfair Display', serif;
+      margin-bottom: 28px; line-height: 1.5;
+    }
+    .hero-body {
+      font-size: 15px; color: rgba(255,255,255,0.65);
+      line-height: 1.7; max-width: 440px; margin-bottom: 44px;
+    }
+    .hero-body strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gold); color: white;
+      padding: 14px 32px; border-radius: 100px;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: #a97520; transform: translateY(-2px); }
+    .btn-secondary {
+      background: transparent; color: white;
+      padding: 14px 32px; border-radius: 100px; border: 1.5px solid rgba(255,255,255,0.35);
+      font-size: 15px; font-weight: 500; text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: white; background: rgba(255,255,255,0.08); }
+    .hero-right {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      padding: 80px 80px 80px 24px;
+    }
+    .hero-photo-stack { position: relative; width: 100%; max-width: 480px; }
+    .hero-photo-main {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      border-radius: 16px; display: block;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    }
+    .hero-photo-accent {
+      position: absolute; bottom: -28px; left: -32px;
+      width: 52%; aspect-ratio: 1; object-fit: cover;
+      border-radius: 12px; border: 4px solid var(--green-deep);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .hero-quote-card {
+      position: absolute; top: 40px; right: -24px;
+      background: white; border-radius: 14px;
+      padding: 16px 20px; max-width: 200px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .hero-quote-card p { font-size: 12px; color: var(--text-mid); line-height: 1.5; font-style: italic; }
+    .hero-quote-card cite { display: block; font-size: 10px; color: var(--green-mid); font-weight: 600; margin-top: 8px; font-style: normal; letter-spacing: 0.04em; text-transform: uppercase; }
+    .hero-stats-bar {
+      grid-column: 1 / -1;
+      background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; padding: 0;
+    }
+    .stat-item {
+      flex: 1; padding: 28px 24px; text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--gold-light); font-weight: 700; }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* ── CRISIS ── */
+    .crisis {
+      background: var(--cream); padding: 100px 80px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .section-eyebrow {
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green-mid); font-weight: 600; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-eyebrow::before { content: ''; display: block; width: 24px; height: 2px; background: var(--green-mid); }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 3.5vw, 48px); line-height: 1.15;
+      color: var(--green-deep); margin-bottom: 24px;
+    }
+    .section-title em { color: var(--red-alert); font-style: italic; }
+    .section-body { font-size: 15px; line-height: 1.8; color: var(--text-mid); }
+    .crisis-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .fact-card {
+      background: white; border-radius: 12px; padding: 24px;
+      border-left: 4px solid var(--green-mid);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .fact-card.red { border-left-color: var(--red-alert); }
+    .fact-big { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--green-deep); line-height: 1; margin-bottom: 6px; }
+    .fact-card.red .fact-big { color: var(--red-alert); }
+    .fact-desc { font-size: 13px; color: var(--text-light); line-height: 1.5; }
+
+    /* ── SOLUTION ── */
+    .solution {
+      background: white; padding: 100px 80px;
+    }
+    .solution-header { text-align: center; max-width: 680px; margin: 0 auto 72px; }
+    .pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .pillar-card {
+      background: var(--cream); border-radius: 16px; padding: 36px 28px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid transparent;
+    }
+    .pillar-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(26,74,46,0.12); border-color: var(--green-light); }
+    .pillar-icon { font-size: 36px; margin-bottom: 16px; }
+    .pillar-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--green-deep); margin-bottom: 10px; }
+    .pillar-text { font-size: 13px; color: var(--text-light); line-height: 1.7; }
+
+    /* ── PHOTO GALLERY ── */
+    .gallery { padding: 80px; background: var(--green-deep); }
+    .gallery-header { text-align: center; margin-bottom: 40px; }
+    .gallery-header .section-eyebrow { justify-content: center; }
+    .gallery-header .section-eyebrow::before { display: none; }
+    .gallery-title { font-family: 'Playfair Display', serif; font-size: 36px; color: white; }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+    .gallery-item { overflow: hidden; border-radius: 12px; position: relative; }
+    .gallery-item:first-child { grid-row: span 2; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+    .gallery-item:hover img { transform: scale(1.04); }
+    .gallery-item:first-child { min-height: 400px; }
+    .gallery-item:not(:first-child) { min-height: 180px; }
+
+    /* ── TEAM / ABOUT DR. ROACH ── */
+    .about {
+      background: var(--cream); padding: 100px 80px;
+      display: grid; grid-template-columns: 5fr 7fr; gap: 80px; align-items: start;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-bg-rect {
+      position: absolute; top: 24px; left: 24px; right: -24px; bottom: -24px;
+      background: var(--green-light); border-radius: 16px; z-index: 0;
+    }
+    .about-img {
+      position: relative; z-index: 1; width: 100%; aspect-ratio: 3/4; object-fit: cover;
+      border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    }
+    .about-badge {
+      position: absolute; bottom: -16px; right: -16px; z-index: 2;
+      background: var(--gold); color: white;
+      padding: 14px 20px; border-radius: 12px;
+      font-size: 12px; font-weight: 600; text-align: center;
+      box-shadow: 0 8px 24px rgba(200,146,42,0.4);
+    }
+    .about-badge strong { display: block; font-size: 22px; font-family: 'Playfair Display', serif; }
+    .team-list { margin-top: 32px; }
+    .team-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; }
+    .team-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .team-tag {
+      background: white; border: 1px solid var(--green-light);
+      color: var(--green-deep); padding: 6px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 500;
+    }
+
+    /* ── BROADER MISSION ── */
+    .mission {
+      background: white; padding: 100px 80px;
+    }
+    .mission-inner { max-width: 1100px; margin: 0 auto; }
+    .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 60px; }
+    .mission-programs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .program-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: var(--cream); border-radius: 12px; padding: 18px;
+    }
+    .program-emoji { font-size: 24px; flex-shrink: 0; }
+    .program-text { font-size: 13px; color: var(--text-mid); line-height: 1.5; font-weight: 500; }
+
+    /* ── PARTNERS / CTA ── */
+    .partner {
+      background: var(--green-deep); padding: 100px 80px;
+    }
+    .partner-header { text-align: center; max-width: 640px; margin: 0 auto 64px; }
+    .partner-header .section-title { color: white; }
+    .partner-header .section-body { color: rgba(255,255,255,0.65); }
+    .partner-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .partner-card {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 36px 28px;
+      transition: background 0.2s;
+    }
+    .partner-card:hover { background: rgba(255,255,255,0.12); }
+    .partner-num { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--gold-light); opacity: 0.5; margin-bottom: 16px; }
+    .partner-card-title { font-size: 17px; font-weight: 600; color: white; margin-bottom: 10px; }
+    .partner-card-body { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.7; }
+    .invite-strip {
+      margin-top: 64px; background: rgba(200,146,42,0.15); border: 1px solid rgba(200,146,42,0.3);
+      border-radius: 12px; padding: 28px 36px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .invite-text { font-size: 14px; color: rgba(255,255,255,0.75); }
+    .invite-text strong { color: var(--gold-light); display: block; font-size: 16px; margin-bottom: 4px; }
+
+    /* ── DONATE ── */
+    .donate-section {
+      background: var(--cream); padding: 100px 80px;
+      text-align: center;
+    }
+    .donate-section .section-title { max-width: 560px; margin: 0 auto 16px; }
+    .donate-section .section-body { max-width: 480px; margin: 0 auto 40px; }
+    .donate-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--red-alert); color: white;
+      padding: 18px 44px; border-radius: 100px; font-size: 18px; font-weight: 600;
+      text-decoration: none; transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 8px 32px rgba(192,57,43,0.35);
+    }
+    .donate-btn:hover { background: #a93226; transform: translateY(-2px); }
+    .donate-note { font-size: 13px; color: var(--text-light); margin-top: 16px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--green-deep); color: rgba(255,255,255,0.7);
+      padding: 60px 80px 40px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 48px; }
+    .footer-brand { }
+    .footer-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .footer-logo img { height: 40px; filter: brightness(0) invert(1); opacity: 0.9; }
+    .footer-logo-name { font-family: 'Playfair Display', serif; font-size: 18px; color: white; }
+    .footer-tagline { font-size: 13px; line-height: 1.7; max-width: 300px; }
+    .footer-col-title { color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: white; }
+    .footer-contact p { font-size: 13px; margin-bottom: 10px; }
+    .footer-contact a { color: var(--gold-light); text-decoration: none; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 28px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-bottom p { font-size: 12px; }
+    .social-links { display: flex; gap: 14px; }
+    .social-link {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .social-link:hover { border-color: white; color: white; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 60px 24px; }
+      .hero-stats-bar { grid-template-columns: repeat(2,1fr); flex-wrap: wrap; }
+      .crisis, .about, .mission-grid { grid-template-columns: 1fr; gap: 40px; padding: 60px 24px; }
+      .pillars-grid, .partner-cards { grid-template-columns: 1fr 1fr; }
+      .solution, .gallery, .partner, .donate-section, .mission { padding: 60px 24px; }
+      footer { padding: 48px 24px 32px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-item:first-child { grid-row: span 1; }
+    }
+    @media (max-width: 600px) {
+      .pillars-grid, .partner-cards, .crisis-facts, .mission-programs { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-left > * { animation: fadeUp 0.7s ease both; }
+    .hero-left > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero-left > *:nth-child(2) { animation-delay: 0.2s; }
+    .hero-left > *:nth-child(3) { animation-delay: 0.3s; }
+    .hero-left > *:nth-child(4) { animation-delay: 0.4s; }
+    .hero-left > *:nth-child(5) { animation-delay: 0.5s; }
+    .hero-left > *:nth-child(6) { animation-delay: 0.6s; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="https://drive.google.com/thumbnail?id=132EcI2C67SNjavLut7Ho5Wy9HHbT2AD-&sz=w80" alt="The JJ Center Logo">
+    <div class="nav-logo-text">
+      The JJ Center, Inc.
+      <span>Ward 8 · Washington, DC</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#crisis">The Crisis</a>
+    <a href="#solution">Our Work</a>
+    <a href="#about">Dr. Roach</a>
+    <a href="#mission">Mission</a>
+    <a href="#partner">Partner</a>
+    <a href="https://givebutter.com/thejjcenter" target="_blank" class="nav-cta">Donate Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-left">
+    <div class="hero-tag">Ward 8, Washington DC · Est. 2005 · 501(c)(3)</div>
+    <h1 class="hero-headline">Using Food as<br><em>Your Medicine</em></h1>
+    <p class="hero-subhead">"When we treat food as medicine,<br>we treat the whole person."</p>
+    <p class="hero-body">
+      The JJ Center Food Pantry provides <strong>free, fresh, farmer's market-style food distributions</strong> every week at Oxon Run Park — with zero barriers, zero eligibility requirements, and no one turned away. Led by Dr. Mary A. Roach, PharmD, we treat food insecurity as the <strong>public health crisis</strong> it is.
+    </p>
+    <div class="hero-actions">
+      <a href="https://givebutter.com/thejjcenter" target="_blank" class="btn-primary">♥ Donate to Feed Families</a>
+      <a href="#solution" class="btn-secondary">Learn Our Mission</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-photo-stack">
+      <img class="hero-photo-main"
+           src="https://drive.google.com/thumbnail?id=15Yn7-Z2n7YeRtiCixaHo1OWXEnwgMn40&sz=w800"
+           alt="JJ Center food distribution event">
+      <img class="hero-photo-accent"
+           src="https://drive.google.com/thumbnail?id=14gxQ7iAC_I5GYNKO8GsWD-oCUvwiSkl-&sz=w400"
+           alt="Fresh produce at JJ Center">
+      <div class="hero-quote-card">
+        <p>"Free food, no limits, no eligibility barriers — every family welcome."</p>
+        <cite>Dr. Mary A. Roach, PharmD · CEO & Founder</cite>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats-bar">
+    <div class="stat-item"><div class="stat-num">75K</div><div class="stat-label">Ward 8 residents served</div></div>
+    <div class="stat-item"><div class="stat-num">1</div><div class="stat-label">Grocery store for 75K people</div></div>
+    <div class="stat-item"><div class="stat-num">15yr</div><div class="stat-label">Life expectancy gap</div></div>
+    <div class="stat-item"><div class="stat-num">$0</div><div class="stat-label">Cost to any resident</div></div>
+    <div class="stat-item"><div class="stat-num">Weekly</div><div class="stat-label">Free market distributions</div></div>
+  </div>
+</section>
+
+<!-- CRISIS -->
+<section class="crisis" id="crisis">
+  <div>
+    <div class="section-eyebrow">The Crisis</div>
+    <h2 class="section-title">This is not food insecurity.<br>This is <em>food apartheid.</em></h2>
+    <p class="section-body">
+      Ward 8 is home to nearly 75,000 Washingtonians — but has access to just <strong>one full-service grocery store</strong> and no regular farmers' markets. Residents are forced to survive on processed corner-store goods, driving disproportionately high rates of diabetes, obesity, and hypertension.<br><br>
+      This is not an accident. It is a systemic failure. And it requires a clinical response.
+    </p>
+  </div>
+  <div class="crisis-facts">
+    <div class="fact-card">
+      <div class="fact-big">1</div>
+      <div class="fact-desc">Full-service grocery store for 75,000 residents in Ward 8</div>
+    </div>
+    <div class="fact-card red">
+      <div class="fact-big">15yr</div>
+      <div class="fact-desc">Life expectancy gap vs. wealthier DC neighborhoods</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-big">$0</div>
+      <div class="fact-desc">Cost to every resident — no limits, no eligibility barriers, no one turned away</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-big">Weekly</div>
+      <div class="fact-desc">Farmers' market-style distributions at the park — free to all, every week</div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="solution-header">
+    <div class="section-eyebrow" style="justify-content:center"><span style="width:0"></span>Our Solution</div>
+    <h2 class="section-title">A Clinically Directed Food Pantry</h2>
+    <p class="section-body" style="color:var(--text-light)">We cross the geographic divide — partnering with grocery stores across the DMV to source fresh produce, lean proteins, and nutrient-dense foods, bringing them directly to Ward 8 families who need them most. Every week. No barriers.</p>
+  </div>
+  <div class="pillars-grid">
+    <div class="pillar-card">
+      <div class="pillar-icon">🥦</div>
+      <h3 class="pillar-title">Radical Accessibility</h3>
+      <p class="pillar-text">Set up outdoors at Oxon Run Park every week in a farmers' market style. Fresh, healthy food completely free. No eligibility requirements, no limits on visits, no one ever turned away.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🩺</div>
+      <h3 class="pillar-title">Clinical Oversight</h3>
+      <p class="pillar-text">Food inventory curated by MDs, PharmDs, Licensed Nutritionists, and Public Health experts — specifically selected to combat chronic disease in our community.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🏫</div>
+      <h3 class="pillar-title">Wellness Workshops</h3>
+      <p class="pillar-text">On-site Healthy Living workshops teaching medical nutrition, chronic disease management, and preventative health. Education alongside every distribution.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🚚</div>
+      <h3 class="pillar-title">DMV Grocery Network</h3>
+      <p class="pillar-text">We actively source fresh, healthy food from grocery store partners across DC, Maryland, and Virginia — and bring it directly back to Ward 8 families every single week.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="gallery-header">
+    <div class="section-eyebrow" style="color:var(--green-light)">In the Community</div>
+    <h2 class="gallery-title">See Us in Action</h2>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <img src="https://drive.google.com/thumbnail?id=15Yn7-Z2n7YeRtiCixaHo1OWXEnwgMn40&sz=w800" alt="JJ Center food distribution">
+    </div>
+    <div class="gallery-item">
+      <img src="https://drive.google.com/thumbnail?id=1M5ixJ6uMLqthy3daQy3iWc7TcYYB2V1E&sz=w600" alt="JJ Center community event">
+    </div>
+    <div class="gallery-item">
+      <img src="https://drive.google.com/thumbnail?id=14gxQ7iAC_I5GYNKO8GsWD-oCUvwiSkl-&sz=w600" alt="Fresh produce at JJ Center">
+    </div>
+    <div class="gallery-item">
+      <img src="https://drive.google.com/thumbnail?id=1Jfu1AseaDL4IeHM_m_6GS89OtPNFXJm6&sz=w600" alt="JJ Center food pantry">
+    </div>
+    <div class="gallery-item">
+      <img src="https://drive.google.com/thumbnail?id=1F-OdbaOBwvQsx2cmZolxyVN7vtdkBeBK&sz=w600" alt="The JJ Center Logo">
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT DR. ROACH -->
+<section class="about" id="about">
+  <div class="about-visual">
+    <div class="about-bg-rect"></div>
+    <img class="about-img"
+         src="https://drive.google.com/thumbnail?id=132EcI2C67SNjavLut7Ho5Wy9HHbT2AD-&sz=w600"
+         alt="The JJ Center — Dr. Mary A. Roach">
+    <div class="about-badge">Est. <strong>2005</strong> Serving DC</div>
+  </div>
+  <div>
+    <div class="section-eyebrow">Leadership</div>
+    <h2 class="section-title">Dr. Mary A. Roach, PharmD</h2>
+    <p class="section-body" style="margin-bottom:20px">
+      CEO &amp; Founder of The JJ Center, Inc., Dr. Roach is a licensed pharmacist with a Doctor of Pharmacy degree — and a lifelong advocate for the health and dignity of Ward 8 residents.
+    </p>
+    <p class="section-body" style="margin-bottom:32px">
+      She founded The JJ Center on a conviction that food insecurity is not a resource problem — it is a <strong>public health crisis requiring a clinical response</strong>. Under her leadership, the organization has secured over $1 million in scholarships for youth, spearheaded food access initiatives, and is now building a full community transformation ecosystem through the <strong>Cornerstone Care Coalition (CCC)</strong>.
+    </p>
+    <p style="font-size:13px;color:var(--green-mid);font-weight:600;margin-bottom:12px">📞 (301) 442-7253 &nbsp;·&nbsp; ✉️ thejjcenter@aol.com</p>
+    <div class="team-list">
+      <div class="team-label">Our Clinical Team</div>
+      <div class="team-tags">
+        <span class="team-tag">Medical Doctors</span>
+        <span class="team-tag">Pharmacists</span>
+        <span class="team-tag">Licensed Nutritionists</span>
+        <span class="team-tag">Public Health Professionals</span>
+        <span class="team-tag">Community Health Workers</span>
+        <span class="team-tag">University Interns</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BROADER MISSION -->
+<section class="mission" id="mission">
+  <div class="mission-inner">
+    <div class="section-eyebrow">The Bigger Story</div>
+    <h2 class="section-title" style="max-width:560px">Beyond the Pantry —<br>The Cornerstone Care Coalition</h2>
+    <div class="mission-grid">
+      <div>
+        <p class="section-body" style="margin-bottom:24px">
+          The food pantry is our anchor — but The JJ Center's mission reaches further. Through the <strong>Cornerstone Care Coalition (CCC)</strong>, we are building a full community transformation ecosystem across Ward 7 and Ward 8 — addressing the Social Determinants of Health that drive inequality in our community.
+        </p>
+        <p class="section-body">
+          The vision: a community where every resident has access to food, health, housing, economic opportunity, and support — and a blueprint that can be <strong>replicated nationally</strong>.
+        </p>
+      </div>
+      <div class="mission-programs">
+        <div class="program-item"><span class="program-emoji">🧠</span><span class="program-text">Behavioral health &amp; mental wellness</span></div>
+        <div class="program-item"><span class="program-emoji">🏠</span><span class="program-text">Housing stability &amp; homelessness prevention</span></div>
+        <div class="program-item"><span class="program-emoji">💼</span><span class="program-text">Workforce development &amp; AI certifications</span></div>
+        <div class="program-item"><span class="program-emoji">💰</span><span class="program-text">Financial literacy &amp; homeownership pathways</span></div>
+        <div class="program-item"><span class="program-emoji">🏥</span><span class="program-text">Chronic disease management &amp; CCBHC clinic (coming)</span></div>
+        <div class="program-item"><span class="program-emoji">🤝</span><span class="program-text">Small business &amp; entrepreneurship support</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNER -->
+<section class="partner" id="partner">
+  <div class="partner-header">
+    <div class="section-eyebrow" style="color:var(--green-light);justify-content:center"><span style="display:none"></span>Get Involved</div>
+    <h2 class="section-title">Three Ways to Partner With Us</h2>
+    <p class="section-body">Your organization can make a direct, measurable impact on the health and lives of Ward 8 families.</p>
+  </div>
+  <div class="partner-cards">
+    <div class="partner-card">
+      <div class="partner-num">01</div>
+      <h3 class="partner-card-title">Underwrite Clinical Wellness Workshops</h3>
+      <p class="partner-card-body">Fund educational materials, medical screening supplies (glucose &amp; blood pressure monitoring), and fresh food demonstration kits for a multi-week workshop series led by our medical team.</p>
+    </div>
+    <div class="partner-card">
+      <div class="partner-num">02</div>
+      <h3 class="partner-card-title">Sponsor Our DMV Grocery Route</h3>
+      <p class="partner-card-body">Fund the weekly transportation costs of sourcing fresh, healthy food from our grocery store partners across DC, Maryland, and Virginia — bringing them directly to Ward 8 families.</p>
+    </div>
+    <div class="partner-card">
+      <div class="partner-num">03</div>
+      <h3 class="partner-card-title">Join Our Medical &amp; Volunteer Alliance</h3>
+      <p class="partner-card-body">Healthcare professionals are welcome to join our clinical volunteer rotation. General volunteers assist with dignified, community-facing food distribution events. All are welcome.</p>
+    </div>
+  </div>
+  <div class="invite-strip">
+    <div>
+      <strong>We welcome all partners:</strong>
+      Churches · Mosques · Temples · Faith-Based Organizations · Civic Groups · Local Businesses · Healthcare Professionals · Philanthropists · Educators · Community Leaders
+    </div>
+    <a href="mailto:thejjcenter@aol.com" class="btn-primary" style="white-space:nowrap">✉ Contact Dr. Roach</a>
+  </div>
+</section>
+
+<!-- DONATE -->
+<section class="donate-section" id="donate">
+  <div class="section-eyebrow" style="justify-content:center"><span style="display:none"></span>Make a Difference Today</div>
+  <h2 class="section-title">Every dollar feeds a family in Ward 8.</h2>
+  <p class="section-body">Your donation directly funds fresh food, transportation, clinical workshops, and medical screenings — all free to every resident who needs them.</p>
+  <a href="https://givebutter.com/thejjcenter" target="_blank" class="donate-btn">
+    ♥ &nbsp;Donate Now via Givebutter
+  </a>
+  <p class="donate-note">The JJ Center, Inc. is a registered 501(c)(3) nonprofit. All donations are tax-deductible.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <img src="https://drive.google.com/thumbnail?id=132EcI2C67SNjavLut7Ho5Wy9HHbT2AD-&sz=w80" alt="JJ Center Logo">
+        <span class="footer-logo-name">The JJ Center, Inc.</span>
+      </div>
+      <p class="footer-tagline">A clinically directed food pantry and community transformation organization serving Ward 8, Washington DC. Using food as medicine to heal our community.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigate</div>
+      <ul class="footer-links">
+        <li><a href="#crisis">The Crisis</a></li>
+        <li><a href="#solution">Our Solution</a></li>
+        <li><a href="#about">Dr. Mary Roach</a></li>
+        <li><a href="#mission">Broader Mission</a></li>
+        <li><a href="#partner">Partner With Us</a></li>
+        <li><a href="https://givebutter.com/thejjcenter" target="_blank">Donate</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-col-title">Contact</div>
+      <p>📞 <a href="tel:3014427253">(301) 442-7253</a></p>
+      <p>✉️ <a href="mailto:thejjcenter@aol.com">thejjcenter@aol.com</a></p>
+      <p style="margin-top:16px;font-size:12px;line-height:1.6">Oxon Run Park<br>700 Valley Ave SE<br>Washington, DC 20032</p>
+      <div style="margin-top:20px">
+        <div class="footer-col-title">Follow Us</div>
+        <p style="font-size:13px;margin-top:8px">@thejjcenter on all platforms</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 The JJ Center, Inc. All rights reserved. 501(c)(3) registered nonprofit.</p>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4)">www.jjcenter.org</p>
+  </div>
+</footer>
+
+</body>
+</html>
