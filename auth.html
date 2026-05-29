@@ -172,7 +172,7 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
 </div>
 
 <!-- Supabase SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initSupabase()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 // ════════════════════════════════════════════════════
@@ -180,30 +180,29 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
 //  Get them from: supabase.com → your project → Settings → API
 // ════════════════════════════════════════════════════
 const SUPABASE_URL      = 'https://mkldikwqxninqcmorwsg.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_sL0EK7R10PR9Pi5O9vmIvQ_LpmwZhYJ';
+const SUPABASE_ANON_KEY = 'sb_publishable_sL0EK7R10PR9Pi5O9vmIvQ_LpmwZhYJ';  // your publishable key
 
-// ════════════════════════════════════════════════════
-//  STEP 2 — Paste your Supabase Edge Function URL here
-//  (handles sending email to hello@jjcenter.org)
-//  Leave as-is for now — works without it, email comes later
-// ════════════════════════════════════════════════════
 const NOTIFY_EMAIL = 'hello@jjcenter.org';
 
-// ── Internal ──
-const configured = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+// ── Init Supabase on page load ──
 let sb = null;
+const configured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' &&
+                   SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
 
 function initSupabase() {
-  if (!configured) {
+  if(!configured){
     document.getElementById('setup-banner').classList.add('show');
     return;
   }
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } catch(e) {
-    console.error('Supabase init error:', e);
+    console.log('Supabase ready ✓');
+  } catch(e){
+    console.error('Supabase error:', e);
   }
 }
+// Run as soon as page loads — no onload needed
+window.addEventListener('DOMContentLoaded', initSupabase);
 
 function showAlert(type, msg) {
   const el = document.getElementById('form-alert');
@@ -232,12 +231,14 @@ async function handleSubmit() {
   btn.classList.add('loading');
   document.getElementById('form-alert').className = 'alert';
 
-  // ── If Supabase not yet configured, show success (demo mode) ──
+  // Init Supabase if not ready yet
+  if(!sb && window.supabase) initSupabase();
+
+  // ── If still not connected, show friendly message ──
   if(!sb) {
-    await new Promise(r => setTimeout(r, 700));
+    showAlert('error', 'Connection issue — please refresh the page and try again.');
     btn.disabled = false;
     btn.classList.remove('loading');
-    showSuccess();
     return;
   }
 
