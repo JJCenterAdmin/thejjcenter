@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The JJ Center — Check In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p1:#16082b;--p2:#2a1052;--p3:#3d1a7a;--p4:#5a2da8;
+  --p6:#c4a8f5;--gold:#c8922a;--gold2:#e8b84b;
+  --cream:#faf7f4;--ink:#1a1520;--muted:#6b5f78;--light:#a898b8;
+  --sans:'Outfit',sans-serif;--serif:'Cormorant Garamond',serif;
+  --green:#1a7a3d;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);background:var(--p1);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+
+.card{background:var(--p2);border-radius:24px;padding:0;width:100%;max-width:420px;overflow:hidden;border:.5px solid rgba(196,168,245,.15);}
+
+/* HEADER */
+.card-header{background:linear-gradient(135deg,var(--p2),var(--p3));padding:28px 28px 24px;text-align:center;}
+.org-name{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--p6);font-weight:600;margin-bottom:6px;}
+.header-title{font-family:var(--serif);font-size:30px;font-weight:600;color:white;margin-bottom:4px;}
+.header-title em{color:var(--gold2);font-style:italic;}
+.header-sub{font-size:13px;color:rgba(196,168,245,.65);}
+
+/* DIVIDER CHOICE */
+.choice-bar{display:flex;margin:0;border-bottom:.5px solid rgba(196,168,245,.12);}
+.choice-btn{flex:1;padding:14px;background:transparent;border:none;color:rgba(196,168,245,.5);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);border-bottom:2px solid transparent;transition:all .2s;}
+.choice-btn.active{color:var(--gold2);border-bottom-color:var(--gold2);}
+
+/* BODY */
+.card-body{padding:28px;}
+
+/* PANELS */
+.pnl{display:none;}
+.pnl.active{display:block;}
+
+/* MEMBER SIGN-IN */
+.sign-in-intro{text-align:center;margin-bottom:20px;}
+.sign-in-intro p{font-size:14px;color:rgba(196,168,245,.7);line-height:1.6;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(196,168,245,.5);margin-bottom:6px;}
+.fg input,.fg select{width:100%;padding:13px 15px;border:.5px solid rgba(196,168,245,.2);border-radius:11px;font-size:14px;font-family:var(--sans);color:white;background:rgba(255,255,255,.06);transition:border-color .2s;}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--gold);}
+.fg input::placeholder{color:rgba(196,168,245,.3);}
+.fg select option{background:var(--p2);color:white;}
+.fg-note{font-size:11px;color:rgba(196,168,245,.4);margin-top:4px;}
+
+.btn-main{width:100%;padding:15px;background:var(--gold);color:var(--p1);border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:opacity .2s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-main:disabled{opacity:.6;cursor:not-allowed;}
+.btn-secondary{width:100%;padding:13px;background:transparent;color:var(--p6);border:.5px solid rgba(196,168,245,.25);border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--sans);margin-top:10px;transition:all .2s;}
+.btn-secondary:hover{background:rgba(196,168,245,.08);}
+
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+.btn-main.loading .spinner{display:block;}
+.btn-main.loading span{display:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:rgba(196,168,245,.3);font-size:11px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(196,168,245,.12);}
+
+.alert{display:none;border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:14px;color:white;}
+.alert.show{display:block;}
+.alert.error{background:rgba(184,48,36,.3);border:.5px solid rgba(184,48,36,.5);}
+
+/* SUCCESS */
+.success-view{display:none;text-align:center;padding:8px 0;}
+.success-icon{font-size:56px;margin-bottom:14px;display:block;animation:pop .5s cubic-bezier(.22,1,.36,1);}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--gold2);margin-bottom:8px;}
+.success-msg{font-size:14px;color:rgba(196,168,245,.7);line-height:1.6;margin-bottom:20px;}
+.success-detail{background:rgba(255,255,255,.05);border-radius:10px;padding:14px;font-size:13px;color:rgba(196,168,245,.6);margin-bottom:16px;}
+.success-detail strong{color:white;display:block;margin-bottom:4px;}
+
+.footer-note{text-align:center;font-size:11px;color:rgba(196,168,245,.25);margin-top:20px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <div class="org-name">The JJ Center, Inc. · Ward 8, DC</div>
+    <h1 class="header-title">Welcome! <em>👋</em></h1>
+    <p class="header-sub">Free food pantry — please check in below</p>
+  </div>
+
+  <div class="choice-bar">
+    <button class="choice-btn active" onclick="switchPane('member')">Have an Account</button>
+    <button class="choice-btn" onclick="switchPane('walkin')">First Time / Walk-In</button>
+  </div>
+
+  <div class="card-body">
+    <!-- ALERT -->
+    <div class="alert" id="ci-alert"></div>
+
+    <!-- MAIN CONTENT (before success) -->
+    <div id="main-view">
+
+      <!-- MEMBER PANEL -->
+      <div class="pnl active" id="pnl-member">
+        <div class="sign-in-intro">
+          <p>Sign in to check in automatically. Your visit will be logged and you can view it in your dashboard.</p>
+        </div>
+        <div class="fg"><label>Email</label><input type="email" id="m-email" placeholder="you@email.com" autocomplete="email"></div>
+        <div class="fg"><label>Password</label><input type="password" id="m-pw" placeholder="Your password" autocomplete="current-password"></div>
+        <button class="btn-main" id="btn-member-ci" onclick="memberCheckIn()">
+          <span>Sign In & Check In</span><div class="spinner"></div>
+        </button>
+        <div class="divider">or</div>
+        <button class="btn-secondary" onclick="switchPane('walkin')">First visit? Fill out your info →</button>
+      </div>
+
+      <!-- WALK-IN PANEL -->
+      <div class="pnl" id="pnl-walkin">
+        <div class="fg"><label>Full Name <span style="color:var(--gold)">*</span></label><input type="text" id="w-name" placeholder="Your name" autocomplete="name"></div>
+        <div class="fg"><label>ZIP Code <span style="color:var(--gold)">*</span></label><input type="text" id="w-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5"></div>
+        <div class="fg">
+          <label>Household Size <span style="color:var(--gold)">*</span></label>
+          <select id="w-household">
+            <option value="" disabled selected>Select...</option>
+            <option value="1">1 person</option>
+            <option value="2">2 people</option>
+            <option value="3-4">3–4 people</option>
+            <option value="5-6">5–6 people</option>
+            <option value="7+">7+ people</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Email <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
+          <input type="email" id="w-email" placeholder="your@email.com" autocomplete="email">
+          <div class="fg-note">We'll invite you to create a free account</div>
+        </div>
+        <div class="fg">
+          <label>Phone <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
+          <input type="tel" id="w-phone" placeholder="(202) 555-0000" inputmode="tel" autocomplete="tel">
+          <div class="fg-note">If no email, we may follow up by phone</div>
+        </div>
+        <button class="btn-main" id="btn-walkin-ci" onclick="walkInCheckIn()">
+          <span>Submit & Check In</span><div class="spinner"></div>
+        </button>
+        <div class="divider">or</div>
+        <button class="btn-secondary" onclick="switchPane('member')">Already have an account? Sign in →</button>
+      </div>
+
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div class="success-view" id="success-view">
+      <span class="success-icon" id="success-icon">✅</span>
+      <h2 class="success-title" id="success-title">You're checked in!</h2>
+      <p class="success-msg" id="success-msg"></p>
+      <div class="success-detail" id="success-detail"></div>
+    </div>
+
+    <p class="footer-note">Your information is kept private and secure.<br>We never sell or share your data.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL      = 'https://mkldikwqxninqcmorwsg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_sL0EK7R10PR9Pi5O9vmIvQ_LpmwZhYJ';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── If member_id in URL (QR scan from dashboard), auto-check-in ──
+const params = new URLSearchParams(location.search);
+const midFromQR = params.get('mid');
+if (midFromQR) autoCheckIn(midFromQR);
+
+async function autoCheckIn(memberId) {
+  const { error } = await sb.from('visits').insert({
+    member_id:  memberId,
+    visited_at: new Date().toISOString(),
+    visit_type: 'QR Scan',
+    source:     'qr'
+  });
+  if (!error) showSuccess('member_qr', null, null);
+}
+
+function switchPane(pane) {
+  document.querySelectorAll('.choice-btn').forEach((b,i) => b.classList.toggle('active',(pane==='member'&&i===0)||(pane==='walkin'&&i===1)));
+  document.getElementById('pnl-member').classList.toggle('active', pane==='member');
+  document.getElementById('pnl-walkin').classList.toggle('active', pane==='walkin');
+  document.getElementById('ci-alert').className = 'alert';
+}
+
+function setLoading(btnId, on) {
+  const b = document.getElementById(btnId);
+  b.disabled = on;
+  b.classList.toggle('loading', on);
+}
+
+function showErr(msg) {
+  const el = document.getElementById('ci-alert');
+  el.className = 'alert error show';
+  el.textContent = msg;
+}
+
+// ══════════════════════════════
+// MEMBER CHECK-IN
+// ══════════════════════════════
+async function memberCheckIn() {
+  const email = document.getElementById('m-email').value.trim();
+  const pw    = document.getElementById('m-pw').value;
+  if (!email.includes('@')) return showErr('Please enter your email address.');
+  if (!pw)                  return showErr('Please enter your password.');
+
+  setLoading('btn-member-ci', true);
+  document.getElementById('ci-alert').className = 'alert';
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+    if (error) throw error;
+
+    // Log visit
+    await sb.from('visits').insert({
+      member_id:  data.user.id,
+      visited_at: new Date().toISOString(),
+      visit_type: 'Member Check-In',
+      source:     'web'
+    });
+
+    const fname = data.user.user_metadata?.first_name || 'Friend';
+    showSuccess('member', fname, email);
+
+  } catch (err) {
+    showErr(err.message?.includes('Invalid') ? 'Incorrect email or password.' : err.message);
+  } finally {
+    setLoading('btn-member-ci', false);
+  }
+}
+
+// ══════════════════════════════
+// WALK-IN CHECK-IN
+// ══════════════════════════════
+async function walkInCheckIn() {
+  const name      = document.getElementById('w-name').value.trim();
+  const zip       = document.getElementById('w-zip').value.trim();
+  const household = document.getElementById('w-household').value;
+  const email     = document.getElementById('w-email').value.trim();
+  const phone     = document.getElementById('w-phone').value.trim();
+
+  if (!name)      return showErr('Please enter your name.');
+  if (!zip || zip.length < 5) return showErr('Please enter a valid 5-digit ZIP code.');
+  if (!household) return showErr('Please select your household size.');
+
+  setLoading('btn-walkin-ci', true);
+  document.getElementById('ci-alert').className = 'alert';
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Log walk-in visit
+    const { data: visit, error: visitErr } = await sb.from('visits').insert({
+      member_id:      null,
+      visitor_name:   name,
+      visitor_zip:    zip,
+      visitor_email:  email || null,
+      visitor_phone:  phone || null,
+      household_size: household,
+      visited_at:     new Date().toISOString(),
+      visit_type:     'Walk-In',
+      source:         'checkin_form'
+    }).select().single();
+
+    if (visitErr) throw visitErr;
+
+    // Auto-invite if email provided
+    if (email) {
+      await sb.from('invite_queue').insert({
+        email,
+        name,
+        phone:       phone || null,
+        visit_date:  today,
+        status:      'pending_email',
+        created_at:  new Date().toISOString()
+      });
+    } else if (phone) {
+      // Phone only — add to next-day call list
+      await sb.from('invite_queue').insert({
+        email:       null,
+        name,
+        phone,
+        visit_date:  today,
+        status:      'pending_call',
+        created_at:  new Date().toISOString()
+      });
+    }
+
+    showSuccess('walkin', name, email);
+
+  } catch (err) {
+    showErr('Something went wrong — please ask staff for help.');
+    console.error(err);
+  } finally {
+    setLoading('btn-walkin-ci', false);
+  }
+}
+
+// ══════════════════════════════
+// SUCCESS STATES
+// ══════════════════════════════
+function showSuccess(type, name, email) {
+  document.getElementById('main-view').style.display = 'none';
+  document.getElementById('success-view').style.display = 'block';
+
+  const icon  = document.getElementById('success-icon');
+  const title = document.getElementById('success-title');
+  const msg   = document.getElementById('success-msg');
+  const det   = document.getElementById('success-detail');
+
+  const now = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const today = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  if (type === 'member' || type === 'member_qr') {
+    icon.textContent  = '✅';
+    title.textContent = `You're checked in!`;
+    msg.textContent   = name
+      ? `Welcome back, ${name}! Your visit has been logged.`
+      : 'Your visit has been logged successfully.';
+    det.innerHTML = `<strong>Visit Logged</strong>${today} at ${now}`;
+  } else if (type === 'walkin') {
+    icon.textContent  = '🎉';
+    title.textContent = `Welcome, ${name}!`;
+    if (email) {
+      msg.textContent = `Your visit is logged. Check your inbox at ${email} — we'll send you a link to create your free JJ Center account.`;
+    } else {
+      msg.textContent = 'Your visit is logged. Thank you for being part of the JJ Center community!';
+    }
+    det.innerHTML = `<strong>Visit Logged</strong>${today} at ${now} · Household: ${document.getElementById('w-household')?.value || ''}`;
+  }
+}
+
+// Enter key
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('pnl-member').classList.contains('active')) memberCheckIn();
+  else walkInCheckIn();
+});
+</script>
+</body>
+</html>
