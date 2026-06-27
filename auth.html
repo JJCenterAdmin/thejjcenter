@@ -208,27 +208,16 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
   <!-- 2FA: METHOD CHOOSER -->
   <div class="tfa-wrap" id="tfa-method">
     <div id="al-tfam" class="alert"></div>
-    <h2 class="pnl-title">Choose <em>verification</em></h2>
-    <p class="pnl-sub">How would you like to receive your one-time code?</p>
-    <div class="method-grid">
-      <div class="method-card" id="mc-email" onclick="selMethod('email')">
-        <div class="mc-ic">📧</div>
-        <div class="mc-title">Email code</div>
-        <div class="mc-sub">Sent to your registered email</div>
-      </div>
-      <div class="method-card" id="mc-sms" onclick="selMethod('sms')">
-        <div class="mc-ic">📱</div>
-        <div class="mc-title">Text message</div>
-        <div class="mc-sub">SMS to your phone number</div>
+    <h2 class="pnl-title">Security <em>verification</em></h2>
+    <p class="pnl-sub">For your security, we require a verification code every time you sign in. We will send a 6-digit code to your registered email address.</p>
+    <div style="background:#f0ecff;border:1px solid rgba(90,45,168,.2);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:28px;">📧</span>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--p2);">Email verification code</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Sent to your registered email address</div>
       </div>
     </div>
-    <!-- Phone input shown only when SMS selected -->
-    <div class="fg" id="phone-fg" style="display:none;">
-      <label>Mobile number</label>
-      <input type="tel" id="tfa-phone" placeholder="+1 (202) 555-0000" inputmode="tel" autocomplete="tel">
-      <div class="hint">US numbers: enter with country code, e.g. +12025550000</div>
-    </div>
-    <button class="btn" id="btn-send-code" onclick="sendCode()"><span class="bl">Send My Code &rarr;</span><div class="spin"></div></button>
+    <button class="btn" id="btn-send-code" onclick="sendEmailCode()"><span class="bl">Send My Code &rarr;</span><div class="spin"></div></button>
     <div class="resend" style="margin-top:14px;"><a onclick="swMain()">&#8592; Back to sign in</a></div>
   </div>
 
@@ -236,10 +225,10 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
   <div class="tfa-wrap" id="tfa-code">
     <div id="al-tfac" class="alert"></div>
     <h2 class="pnl-title">Enter <em>your code</em></h2>
-    <p class="pnl-sub" id="code-sub">Enter the 6-digit code we sent you.</p>
+    <p class="pnl-sub" id="code-sub">Enter the 6-digit code sent to your email. It expires in 10 minutes.</p>
     <div class="fg"><label>Verification code</label><input type="text" id="otp" class="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code"></div>
     <button class="btn" id="btn-verify" onclick="verifyCode()"><span class="bl">Verify &amp; Sign In &rarr;</span><div class="spin"></div></button>
-    <div class="resend">Didn&rsquo;t get a code? <a onclick="backToMethod()">Try a different method</a> &middot; <a onclick="resendCode()">Resend</a></div>
+    <div class="resend">Didn&rsquo;t get a code? <a onclick="resendCode()">Resend</a> &middot; <a onclick="swMain()">Back to sign in</a></div>
   </div>
 
   <!-- FORGOT PASSWORD -->
@@ -490,15 +479,10 @@ async function doLogin() {
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
     if (error) throw error;
-    // Check if 2FA is enabled
-    const { data: member } = await sb.from('members').select('twofa_enabled,twofa_method').eq('id', data.user.id).single();
-    if (member?.twofa_enabled) {
-      await sb.auth.signOut();
-      window._tfa = { email: em, pw };
-      swTFA('method');
-    } else {
-      window._sa = true; startSess(); location.href = 'dashboard.html';
-    }
+    // 2FA is REQUIRED for all members — no exceptions
+    await sb.auth.signOut(); // sign out temporarily until 2FA verified
+    window._tfa = { email: em, pw };
+    swTFA('method');
   } catch (err) {
     const locked = rlRecord('in', document.getElementById('rl-in'));
     if (!locked) {
@@ -511,43 +495,23 @@ async function doLogin() {
 }
 
 // ═══════════════════════════════════════════════
-// 2FA — METHOD SELECTION + CODE
+// 2FA — EMAIL CODE ONLY (SMS coming later)
 // ═══════════════════════════════════════════════
-let _tfaMethod = null;
-
-function selMethod(m) {
-  _tfaMethod = m;
-  document.getElementById('mc-email').classList.toggle('sel', m === 'email');
-  document.getElementById('mc-sms').classList.toggle('sel', m === 'sms');
-  document.getElementById('phone-fg').style.display = m === 'sms' ? 'block' : 'none';
-}
-
-async function sendCode() {
-  if (!_tfaMethod) return alert('al-tfam','err','Please choose a verification method.');
+async function sendEmailCode() {
   clrAlert('al-tfam');
-  if (_tfaMethod === 'sms') {
-    const phone = document.getElementById('tfa-phone').value.trim();
-    if (!phone) return alert('al-tfam','err','Please enter your mobile number.');
-    // Store phone for SMS — Supabase MFA or Edge Function handles delivery
-    window._tfa.phone = phone;
-  }
   ld('btn-send-code', true);
   try {
-    // Sign in first to get session, then trigger MFA challenge
-    const { data, error } = await sb.auth.signInWithPassword({ email: window._tfa.email, password: window._tfa.pw });
+    // Send OTP to their registered email
+    const { error } = await sb.auth.signInWithOtp({
+      email: window._tfa.email,
+      options: { shouldCreateUser: false }
+    });
     if (error) throw error;
-    if (_tfaMethod === 'email') {
-      // Email OTP via Supabase signInWithOtp (sends to registered email)
-      await sb.auth.signOut();
-      await sb.auth.signInWithOtp({ email: window._tfa.email, options: { shouldCreateUser: false } });
-      document.getElementById('code-sub').textContent = 'Enter the 6-digit code sent to your email address.';
-    } else {
-      // SMS OTP — uses Supabase phone OTP
-      await sb.auth.signOut();
-      await sb.auth.signInWithOtp({ phone: window._tfa.phone, options: { shouldCreateUser: false } });
-      document.getElementById('code-sub').textContent = 'Enter the 6-digit code sent via text to ' + window._tfa.phone + '.';
-    }
+    document.getElementById('code-sub').textContent =
+      'Enter the 6-digit code sent to ' + window._tfa.email + '. It expires in 10 minutes.';
     swTFA('code');
+    // Auto-focus the OTP input
+    setTimeout(() => document.getElementById('otp')?.focus(), 300);
   } catch (err) {
     alert('al-tfam', 'err', err.message || 'Could not send code. Please try again.');
   } finally { ld('btn-send-code', false); }
@@ -559,22 +523,25 @@ async function verifyCode() {
   clrAlert('al-tfac');
   ld('btn-verify', true);
   try {
-    let verifyRes;
-    if (_tfaMethod === 'email') {
-      verifyRes = await sb.auth.verifyOtp({ email: window._tfa.email, token: code, type: 'email' });
-    } else {
-      verifyRes = await sb.auth.verifyOtp({ phone: window._tfa.phone, token: code, type: 'sms' });
-    }
-    if (verifyRes.error) throw verifyRes.error;
+    const { error } = await sb.auth.verifyOtp({
+      email: window._tfa.email,
+      token: code,
+      type: 'email'
+    });
+    if (error) throw error;
     window._sa = true; startSess(); location.href = 'dashboard.html';
   } catch (err) {
-    alert('al-tfac', 'err', err.message?.includes('expired') ? 'Code expired. Please request a new one.' : 'Incorrect code. Please try again.');
+    alert('al-tfac', 'err',
+      err.message?.includes('expired') ? 'Code expired. Please go back and request a new one.' :
+      err.message?.includes('invalid') || err.message?.includes('Invalid') ? 'Incorrect code. Please try again.' :
+      err.message || 'Verification failed. Please try again.');
   } finally { ld('btn-verify', false); }
 }
 
 async function resendCode() {
   document.getElementById('otp').value = '';
-  await sendCode();
+  swTFA('method');
+  await sendEmailCode();
 }
 
 // ═══════════════════════════════════════════════
