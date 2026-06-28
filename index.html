@@ -1602,8 +1602,7 @@ body.menu-open{overflow:hidden;}
     <a href="#dr-roach" class="nav-link">Dr. Roach</a>
     <a href="#portal" class="nav-link">Join</a>
     <a href="#partner" class="nav-link">Partner</a>
-    <a href="auth.html#signin" class="nav-btn" style="text-decoration:none;display:inline-flex;align-items:center;">Sign In</a>
-    <a href="auth.html" class="nav-cta" style="text-decoration:none;">Sign Up</a>
+    <a href="auth.html" class="nav-cta" style="text-decoration:none;">Sign Up / Sign In</a>
     <a href="https://givebutter.com/thejjcenter" target="_blank" class="nav-cta">Donate ♥</a>
     <!-- Hamburger — mobile only -->
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
@@ -1621,11 +1620,8 @@ body.menu-open{overflow:hidden;}
   <a href="#dr-roach" onclick="closeMenu()"><span class="mobile-menu-icon">👩🏾‍⚕️</span>Dr. Roach</a>
   <a href="#portal" onclick="closeMenu()"><span class="mobile-menu-icon">♛</span>Join — Member Portal</a>
   <a href="#partner" onclick="closeMenu()"><span class="mobile-menu-icon">🤝</span>Partner With Us</a>
-  <a href="auth.html#signin" onclick="closeMenu()" class="mobile-menu-donate" style="background:rgba(255,255,255,.1);color:white;">
-    <span class="mobile-menu-icon">🔑</span>Sign In
-  </a>
   <a href="auth.html" onclick="closeMenu()" class="mobile-menu-donate" style="background:linear-gradient(135deg,var(--p3),var(--p4));">
-    <span class="mobile-menu-icon">♛</span>Sign Up Free
+    <span class="mobile-menu-icon">🔑</span>Sign Up / Sign In
   </a>
   <a href="https://givebutter.com/thejjcenter" target="_blank" onclick="closeMenu()" class="mobile-menu-donate">
     ♥ &nbsp;Donate Now
@@ -1999,10 +1995,10 @@ body.menu-open{overflow:hidden;}
       <div class="portal-benefits">
         <div id="notify-section" style="background:rgba(200,146,42,.07);border:1px solid rgba(200,146,42,.2);border-radius:12px;padding:20px 22px;margin-bottom:20px;">
         <p style="font-size:13px;font-weight:600;color:var(--gold2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">📬  Get Schedule Updates</p>
-        <p style="font-size:13px;color:rgba(255,255,255,.6);margin-bottom:14px;line-height:1.6;">Enter your name and email to receive Saturday distribution reminders, cancellations, and location updates — no account required.</p>
+        <p style="font-size:13px;color:#5a4a6a;margin-bottom:14px;line-height:1.6;">Enter your name and email to receive Saturday distribution reminders, cancellations, and location updates — no account required.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <input id="notify-name" type="text" placeholder="Your name" style="background:rgba(255,255,255,.08);border:1px solid rgba(200,146,42,.25);border-radius:8px;padding:11px 14px;font-size:14px;color:white;outline:none;font-family:inherit;" />
-          <input id="notify-email" type="email" placeholder="Your email address" style="background:rgba(255,255,255,.08);border:1px solid rgba(200,146,42,.25);border-radius:8px;padding:11px 14px;font-size:14px;color:white;outline:none;font-family:inherit;" />
+          <input id="notify-name" type="text" placeholder="Your name" style="background:white;border:1px solid rgba(200,146,42,.4);border-radius:8px;padding:11px 14px;font-size:14px;color:#1a1520;outline:none;font-family:inherit;" />
+          <input id="notify-email" type="email" placeholder="Your email address" style="background:white;border:1px solid rgba(200,146,42,.4);border-radius:8px;padding:11px 14px;font-size:14px;color:#1a1520;outline:none;font-family:inherit;" />
           <button onclick="doNotify()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:#16082b;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:12px;cursor:pointer;font-family:inherit;letter-spacing:.02em;">Notify Me</button>
         </div>
         <div id="notify-ok" style="display:none;margin-top:12px;font-size:13px;color:var(--gold2);text-align:center;">✅ You're on the list! We'll keep you updated.</div>
@@ -2058,12 +2054,12 @@ body.menu-open{overflow:hidden;}
     <p>Live updates, wellness videos, workshop registration, and more — all in your dashboard.</p>
   </div>
   <div class="dash-grid" id="dash-grid">
-    <div class="dc"><div class="dc-icon">📅</div><h3>Live Pantry Schedule</h3><p>See this week's times and last-minute changes. Never miss a distribution.</p><span class="dc-badge">🟢 This Saturday · 10am–2pm</span></div>
-    <div class="dc"><div class="dc-icon">🎬</div><h3>Health &amp; Wellness Library</h3><p>Exclusive videos from Dr. Roach, MDs, PharmDs, and Nutritionists on managing chronic disease.</p><span class="dc-badge gold">🆕 3 New Videos</span></div>
-    <div class="dc"><div class="dc-icon">🩺</div><h3>Upcoming Workshops</h3><p>Register for on-site Healthy Living workshops — diabetes, nutrition, blood pressure control.</p><span class="dc-badge">Next: June 7th</span></div>
+    <div class="dc"><div class="dc-icon">📅</div><h3>Live Pantry Schedule</h3><p>See this week's times and last-minute changes. Never miss a distribution.</p><span class="dc-badge">🟢 Live Updates</span></div>
+    <div class="dc" style="opacity:.55;pointer-events:none;"><div class="dc-icon">🎬</div><h3>Health &amp; Wellness Library</h3><p>Exclusive videos from Dr. Roach, MDs, PharmDs, and Nutritionists on managing chronic disease.</p><span class="dc-badge" style="background:rgba(0,0,0,.06);color:#888;">Coming Soon</span></div>
+    <div class="dc" style="opacity:.55;pointer-events:none;"><div class="dc-icon">🩺</div><h3>Upcoming Workshops</h3><p>Register for on-site Healthy Living workshops — diabetes, nutrition, blood pressure control.</p><span class="dc-badge" style="background:rgba(0,0,0,.06);color:#888;">Coming Soon</span></div>
     <div class="dc"><div class="dc-icon">🔔</div><h3>Program Alerts</h3><p>Get notified about holiday drives, new services, special events, and community announcements.</p><span class="dc-badge">SMS &amp; Email</span></div>
-    <div class="dc"><div class="dc-icon">📋</div><h3>My Health Resources</h3><p>Personalized nutrition guides and chronic disease resources curated for your household.</p><span class="dc-badge">Personalized</span></div>
-    <div class="dc"><div class="dc-icon">🤝</div><h3>Volunteer Sign-Up</h3><p>Healthcare professionals and community volunteers can book shifts. Browse open roles on Idealist.</p><span class="dc-badge"><a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" style="color:inherit;text-decoration:none;">View on Idealist →</a></span></div>
+    <div class="dc" style="opacity:.55;pointer-events:none;"><div class="dc-icon">📋</div><h3>My Health Resources</h3><p>Personalized nutrition guides and chronic disease resources curated for your household.</p><span class="dc-badge" style="background:rgba(0,0,0,.06);color:#888;">Coming Soon</span></div>
+    <div class="dc" style="opacity:.55;pointer-events:none;"><div class="dc-icon">🤝</div><h3>Volunteer Sign-Up</h3><p>Healthcare professionals and community volunteers can book shifts. Browse open roles on Idealist.</p><span class="dc-badge" style="background:rgba(0,0,0,.06);color:#888;">Coming Soon</span></div>
   </div>
 </section>
 
