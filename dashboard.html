@@ -102,9 +102,75 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 /* ── SAVE BANNER ── */
 .save-banner{position:fixed;bottom:24px;right:24px;background:var(--green);color:white;padding:12px 20px;border-radius:100px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
 .save-banner.show{transform:translateY(0);opacity:1;}
+
+/* ── PROFILE CARD ── */
+.profile-card{background:white;border-radius:16px;border:1px solid #e4ddf0;padding:28px;margin-bottom:28px;}
+.profile-card-title{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--p2);margin-bottom:4px;}
+.profile-card-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.profile-grid{grid-template-columns:1fr;}}
+.pf-group{display:flex;flex-direction:column;gap:6px;}
+.pf-group label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.pf-group input,.pf-group select{padding:11px 14px;border:1.5px solid #e4ddf0;border-radius:10px;font-size:14px;font-family:var(--sans);color:var(--ink);background:white;transition:border-color .2s;}
+.pf-group input:focus,.pf-group select:focus{outline:none;border-color:var(--p4);}
+.pf-group input:disabled{background:#f9f7ff;color:var(--muted);}
+.pf-hint{font-size:11px;color:var(--light);margin-top:2px;}
+.profile-actions{display:flex;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap;}
+.btn-save-profile{background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 24px;border-radius:100px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);transition:opacity .2s;}
+.btn-save-profile:hover{opacity:.88;}
+.btn-save-profile:disabled{opacity:.5;cursor:not-allowed;}
+.pw-change-toggle{font-size:13px;color:var(--p4);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:var(--sans);}
+.pw-change-section{display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e4ddf0;}
+.pw-change-section.open{display:block;}
+
+/* ── PROFILE COMPLETION POPUP ── */
+.profile-popup-overlay{position:fixed;inset:0;background:rgba(22,8,43,.6);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .3s;}
+.profile-popup-overlay.show{opacity:1;}
+.profile-popup{background:white;border-radius:20px;padding:36px;max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.25);transform:translateY(20px);transition:transform .3s;}
+.profile-popup-overlay.show .profile-popup{transform:translateY(0);}
+.popup-icon{font-size:44px;margin-bottom:16px;display:block;}
+.popup-title{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--p2);margin-bottom:8px;}
+.popup-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.popup-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.popup-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.popup-field input,.popup-field select{width:100%;padding:11px 14px;border:1.5px solid #e4ddf0;border-radius:10px;font-size:14px;font-family:var(--sans);color:var(--ink);}
+.popup-field input:focus,.popup-field select:focus{outline:none;border-color:var(--p4);}
+.popup-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-popup-save{flex:1;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:13px;border-radius:100px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);}
+.btn-popup-skip{background:transparent;color:var(--muted);padding:13px 20px;border-radius:100px;font-size:13px;border:1px solid #e4ddf0;cursor:pointer;font-family:var(--sans);}
 </style>
 </head>
 <body>
+
+<!-- PROFILE COMPLETION POPUP -->
+<div class="profile-popup-overlay" id="profile-popup-overlay">
+  <div class="profile-popup">
+    <span class="popup-icon">👋</span>
+    <h2 class="popup-title">Help us serve you better</h2>
+    <p class="popup-sub">Your ZIP code and household size help us plan food quantities and track our community impact. Takes 30 seconds.</p>
+    <div class="popup-fields">
+      <div class="popup-field">
+        <label>ZIP Code</label>
+        <input type="text" id="popup-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
+      </div>
+      <div class="popup-field">
+        <label>Household Size</label>
+        <select id="popup-household">
+          <option value="" disabled selected>Select...</option>
+          <option value="1">1 person</option>
+          <option value="2">2 people</option>
+          <option value="3-4">3–4 people</option>
+          <option value="5-6">5–6 people</option>
+          <option value="7+">7+ people</option>
+        </select>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-popup-save" onclick="saveProfilePopup()">Save & Continue →</button>
+      <button class="btn-popup-skip" onclick="dismissPopup()">Maybe later</button>
+    </div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav class="dash-nav">
@@ -140,6 +206,65 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
       <canvas id="qr-canvas"></canvas>
       <div class="hero-qr-label">Your Check-In Code</div>
       <div class="hero-qr-sub">Show at the welcome desk</div>
+    </div>
+  </div>
+
+  <!-- MY PROFILE -->
+  <div class="profile-card">
+    <h3 class="profile-card-title">My Profile</h3>
+    <p class="profile-card-sub">Keep your information up to date so we can serve you better.</p>
+    <div class="profile-grid">
+      <div class="pf-group">
+        <label>First Name</label>
+        <input type="text" id="pf-fn" placeholder="First name">
+      </div>
+      <div class="pf-group">
+        <label>Last Name</label>
+        <input type="text" id="pf-ln" placeholder="Last name">
+      </div>
+      <div class="pf-group">
+        <label>Email Address</label>
+        <input type="email" id="pf-em" disabled>
+        <div class="pf-hint">Email cannot be changed here — contact hello@jjcenter.org</div>
+      </div>
+      <div class="pf-group">
+        <label>Phone Number</label>
+        <input type="tel" id="pf-phone" placeholder="(202) 555-0000" inputmode="tel">
+      </div>
+      <div class="pf-group">
+        <label>ZIP Code</label>
+        <input type="text" id="pf-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
+      </div>
+      <div class="pf-group">
+        <label>Household Size</label>
+        <select id="pf-household">
+          <option value="" disabled>Select...</option>
+          <option value="1">1 person</option>
+          <option value="2">2 people</option>
+          <option value="3-4">3–4 people</option>
+          <option value="5-6">5–6 people</option>
+          <option value="7+">7+ people</option>
+        </select>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <button class="btn-save-profile" id="btn-save-profile" onclick="saveProfile()">Save Changes</button>
+      <button class="pw-change-toggle" onclick="togglePwChange()">Change Password</button>
+    </div>
+    <div class="pw-change-section" id="pw-change-section">
+      <div class="profile-grid">
+        <div class="pf-group">
+          <label>New Password</label>
+          <input type="password" id="pf-pw1" placeholder="At least 8 characters">
+        </div>
+        <div class="pf-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="pf-pw2" placeholder="Repeat new password">
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn-save-profile" onclick="savePassword()">Update Password</button>
+      </div>
     </div>
   </div>
 
@@ -243,7 +368,7 @@ async function loadDashboard() {
   );
 
   // Load all data in parallel
-  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs()]);
+  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfile()]);
 
   document.getElementById('dash-loading').style.display = 'none';
   document.getElementById('dash-content').style.display = 'block';
@@ -297,6 +422,97 @@ async function loadAnnouncements() {
       <div class="announce-body">${p.body}</div>
     </div>`;
   }).join('');
+}
+
+// ── UI helpers ──
+// ═══════════════════════════════════════════════
+// PROFILE — Load & Save
+// ═══════════════════════════════════════════════
+async function loadProfile() {
+  const { data } = await sb.from('members')
+    .select('first_name,last_name,email,phone,zip_code,household_size')
+    .eq('id', currentUser.id).single();
+  if (!data) return;
+  document.getElementById('pf-fn').value        = data.first_name    || '';
+  document.getElementById('pf-ln').value        = data.last_name     || '';
+  document.getElementById('pf-em').value        = data.email         || currentUser.email || '';
+  document.getElementById('pf-phone').value     = data.phone         || '';
+  document.getElementById('pf-zip').value       = data.zip_code      || '';
+  const hh = document.getElementById('pf-household');
+  if (data.household_size) hh.value = data.household_size;
+
+  // Check if profile incomplete — show popup after 10 seconds
+  if (!data.zip_code || !data.household_size) {
+    setTimeout(showProfilePopup, 10000);
+  }
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('btn-save-profile');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const { error } = await sb.from('members').update({
+    first_name:     document.getElementById('pf-fn').value.trim(),
+    last_name:      document.getElementById('pf-ln').value.trim(),
+    phone:          document.getElementById('pf-phone').value.trim() || null,
+    zip_code:       document.getElementById('pf-zip').value.trim()   || null,
+    household_size: document.getElementById('pf-household').value    || null,
+    updated_at:     new Date().toISOString()
+  }).eq('id', currentUser.id);
+  btn.disabled = false; btn.textContent = 'Save Changes';
+  if (error) { alert('Could not save changes: ' + error.message); return; }
+  showBanner();
+  // Update nav name
+  document.getElementById('nav-name').textContent = document.getElementById('pf-fn').value || 'Member';
+  document.getElementById('hero-name').textContent = document.getElementById('pf-fn').value || 'Friend';
+}
+
+async function savePassword() {
+  const pw1 = document.getElementById('pf-pw1').value;
+  const pw2 = document.getElementById('pf-pw2').value;
+  if (!pw1) { alert('Please enter a new password.'); return; }
+  if (pw1.length < 8) { alert('Password must be at least 8 characters.'); return; }
+  if (pw1 !== pw2) { alert('Passwords do not match.'); return; }
+  const { error } = await sb.auth.updateUser({ password: pw1 });
+  if (error) { alert('Could not update password: ' + error.message); return; }
+  document.getElementById('pf-pw1').value = '';
+  document.getElementById('pf-pw2').value = '';
+  document.getElementById('pw-change-section').classList.remove('open');
+  showBanner();
+}
+
+function togglePwChange() {
+  document.getElementById('pw-change-section').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════
+// PROFILE COMPLETION POPUP
+// ═══════════════════════════════════════════════
+function showProfilePopup() {
+  const overlay = document.getElementById('profile-popup-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => overlay.classList.add('show'), 10);
+}
+
+function dismissPopup() {
+  const overlay = document.getElementById('profile-popup-overlay');
+  overlay.classList.remove('show');
+  setTimeout(() => overlay.style.display = 'none', 300);
+}
+
+async function saveProfilePopup() {
+  const zip       = document.getElementById('popup-zip').value.trim();
+  const household = document.getElementById('popup-household').value;
+  if (!zip && !household) { dismissPopup(); return; }
+  await sb.from('members').update({
+    zip_code:       zip       || null,
+    household_size: household || null,
+    updated_at:     new Date().toISOString()
+  }).eq('id', currentUser.id);
+  // Also update the profile fields if visible
+  if (zip)       document.getElementById('pf-zip').value = zip;
+  if (household) document.getElementById('pf-household').value = household;
+  dismissPopup();
+  showBanner();
 }
 
 // ── UI helpers ──
