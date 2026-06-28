@@ -354,6 +354,12 @@ if (new URLSearchParams(location.search).get('timeout')) setTimeout(() => alert(
 // ═══════════════════════════════════════════════
 // UI HELPERS
 // ═══════════════════════════════════════════════
+
+// Auto-switch to Sign In tab if URL has #signin
+window.addEventListener('DOMContentLoaded', () => {
+  if (location.hash === '#signin') swTab('in');
+});
+
 function swTab(t) {
   document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('on', (t === 'up' && i === 0) || (t === 'in' && i === 1)));
   document.getElementById('pnl-up').classList.toggle('on', t === 'up');
@@ -501,10 +507,15 @@ async function sendEmailCode() {
   clrAlert('al-tfam');
   ld('btn-send-code', true);
   try {
-    // Send OTP to their registered email
+    // Send OTP code (6-digit) to their registered email
+    // shouldCreateUser: false = only works for existing accounts
+    // type is 'email' OTP — sends a code, NOT a magic link
     const { error } = await sb.auth.signInWithOtp({
       email: window._tfa.email,
-      options: { shouldCreateUser: false }
+      options: {
+        shouldCreateUser: false,
+        data: { purpose: '2fa_verification' }
+      }
     });
     if (error) throw error;
     document.getElementById('code-sub').textContent =
