@@ -155,7 +155,7 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
       <div id="al-up" class="alert"></div>
       <div id="rl-up" class="rl"></div>
       <h2 class="pnl-title">Join <em>The JJ Center</em></h2>
-      <p class="pnl-sub">Free account &mdash; use any email address. No Gmail required.</p>
+      <p class="pnl-sub">Free account &mdash; use any email address. No Gmail required. We'll send a one-time code to verify.</p>
       <div class="row2">
         <div class="fg"><label>First name</label><input type="text" id="up-fn" placeholder="Mary" autocomplete="given-name"></div>
         <div class="fg"><label>Last name</label><input type="text" id="up-ln" placeholder="Johnson" autocomplete="family-name"></div>
@@ -165,22 +165,7 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
         <input type="email" id="up-em" placeholder="you@anyemail.com" autocomplete="email">
         <div class="hint">Works with Gmail, Yahoo, Outlook, iCloud, work email &mdash; anything.</div>
       </div>
-      <div class="fg">
-        <label>Password</label>
-        <div class="pw-wrap">
-          <input type="password" id="up-pw" placeholder="At least 8 characters" autocomplete="new-password" oninput="pwStr(this.value)">
-          <button class="pw-eye" type="button" onclick="togPw('up-pw',this)">Show</button>
-        </div>
-        <div class="pw-str" id="pw-str"><div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div><span class="pw-lbl" id="pw-lbl"></span></div>
-      </div>
-      <div class="fg">
-        <label>Confirm password</label>
-        <div class="pw-wrap">
-          <input type="password" id="up-pw2" placeholder="Repeat password" autocomplete="new-password">
-          <button class="pw-eye" type="button" onclick="togPw('up-pw2',this)">Show</button>
-        </div>
-      </div>
-      <button class="btn" id="btn-up" onclick="doSignup()"><span class="bl">Create My Account &rarr;</span><div class="spin"></div></button>
+      <button class="btn" id="btn-up" onclick="doSignup()"><span class="bl">Send My Code &rarr;</span><div class="spin"></div></button>
       <p class="legal">By signing up you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.<br>Health information is always optional and HIPAA-protected.</p>
       <div class="bk"><a href="index.html">&larr; Back to The JJ Center</a></div>
     </div>
@@ -190,17 +175,9 @@ body{background:var(--p1);min-height:100vh;display:flex;align-items:stretch;}
       <div id="al-in" class="alert"></div>
       <div id="rl-in" class="rl"></div>
       <h2 class="pnl-title">Welcome <em>back.</em></h2>
-      <p class="pnl-sub">Sign in with any email you used to register.</p>
+      <p class="pnl-sub">Enter your email and we'll send a 6-digit sign-in code — no password needed.</p>
       <div class="fg"><label>Email address</label><input type="email" id="in-em" placeholder="you@anyemail.com" autocomplete="email"></div>
-      <div class="fg">
-        <label>Password</label>
-        <div class="pw-wrap">
-          <input type="password" id="in-pw" placeholder="Your password" autocomplete="current-password">
-          <button class="pw-eye" type="button" onclick="togPw('in-pw',this)">Show</button>
-        </div>
-      </div>
-      <div class="fl"><a href="#" onclick="swForgot()">Forgot password?</a></div>
-      <button class="btn" id="btn-in" onclick="doLogin()"><span class="bl">Sign In &rarr;</span><div class="spin"></div></button>
+      <button class="btn" id="btn-in" onclick="doLogin()"><span class="bl">Send My Code &rarr;</span><div class="spin"></div></button>
       <div class="bk"><a href="index.html">&larr; Back to The JJ Center</a></div>
     </div>
   </div>
@@ -440,33 +417,23 @@ async function doSignup() {
   const fn = document.getElementById('up-fn').value.trim();
   const ln = document.getElementById('up-ln').value.trim();
   const em = document.getElementById('up-em').value.trim();
-  const pw = document.getElementById('up-pw').value;
-  const pw2 = document.getElementById('up-pw2').value;
   clrAlert('al-up');
   if (!fn || !ln) return alert('al-up','err','Please enter your first and last name.');
   if (!em.includes('@') || !em.includes('.')) return alert('al-up','err','Please enter a valid email address.');
-  if (pw.length < 8) return alert('al-up','err','Password must be at least 8 characters.');
-  if (pw !== pw2) return alert('al-up','err','Passwords do not match.');
   ld('btn-up', true);
   try {
-    const { data, error } = await sb.auth.signUp({
-      email: em, password: pw,
-      options: { data: { first_name: fn, last_name: ln }, emailRedirectTo: location.origin + '/dashboard.html' }
+    const { error } = await sb.auth.signInWithOtp({
+      email: em,
+      options: { shouldCreateUser: true, data: { first_name: fn, last_name: ln } }
     });
     if (error) throw error;
-    if (data.user) {
-      await sb.from('members').upsert({ id: data.user.id, email: em, first_name: fn, last_name: ln, source: 'web_signup', created_at: new Date().toISOString() });
-      await sb.from('waitlist').delete().eq('email', em);
-    }
-    document.getElementById('main').style.display = 'none';
-    document.getElementById('suc').style.display = 'block';
-    document.getElementById('suc-msg').textContent = 'We sent a confirmation email to ' + em + '. Click the link to activate your account, then come back to sign in.';
+    window._tfa = { email: em, fn, ln, source: 'web_signup' };
+    document.getElementById('code-sub').textContent = 'Enter the 6-digit code sent to ' + em + '. It expires in 10 minutes.';
+    swTFA('code');
+    setTimeout(() => document.getElementById('otp')?.focus(), 300);
   } catch (err) {
     rlRecord('up', document.getElementById('rl-up'));
-    const msg = err.message?.toLowerCase().includes('already registered')
-      ? 'An account with this email already exists. Please sign in instead.'
-      : (err.message || 'Something went wrong. Please try again.');
-    alert('al-up', 'err', msg);
+    alert('al-up', 'err', err.message || 'Something went wrong. Please try again.');
   } finally { ld('btn-up', false); }
 }
 
@@ -477,55 +444,23 @@ async function doLogin() {
   const rl = rlCheck('in');
   if (rl.blocked) { document.getElementById('rl-in').className='rl on'; document.getElementById('rl-in').textContent='Account locked. Wait '+rl.mins+' min.'; return; }
   const em = document.getElementById('in-em').value.trim();
-  const pw = document.getElementById('in-pw').value;
   clrAlert('al-in');
   if (!em.includes('@')) return alert('al-in','err','Please enter your email address.');
-  if (!pw) return alert('al-in','err','Please enter your password.');
   ld('btn-in', true);
   try {
-    const { data, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
-    if (error) throw error;
-    // 2FA is REQUIRED for all members — no exceptions
-    await sb.auth.signOut(); // sign out temporarily until 2FA verified
-    window._tfa = { email: em, pw };
-    swTFA('method');
-  } catch (err) {
-    const locked = rlRecord('in', document.getElementById('rl-in'));
-    if (!locked) {
-      const rem = MAX - (ATT['in']?.n || 0);
-      alert('al-in', 'err', err.message?.toLowerCase().includes('invalid')
-        ? 'Incorrect email or password.' + (rem > 0 ? ' ' + rem + ' attempt(s) remaining.' : '')
-        : (err.message || 'Sign in failed. Please try again.'));
-    }
-  } finally { ld('btn-in', false); }
-}
-
-// ═══════════════════════════════════════════════
-// 2FA — EMAIL CODE ONLY (SMS coming later)
-// ═══════════════════════════════════════════════
-async function sendEmailCode() {
-  clrAlert('al-tfam');
-  ld('btn-send-code', true);
-  try {
-    // Send OTP code (6-digit) to their registered email
-    // shouldCreateUser: false = only works for existing accounts
-    // type is 'email' OTP — sends a code, NOT a magic link
     const { error } = await sb.auth.signInWithOtp({
-      email: window._tfa.email,
-      options: {
-        shouldCreateUser: false,
-        data: { purpose: '2fa_verification' }
-      }
+      email: em,
+      options: { shouldCreateUser: true }
     });
     if (error) throw error;
-    document.getElementById('code-sub').textContent =
-      'Enter the 6-digit code sent to ' + window._tfa.email + '. It expires in 10 minutes.';
+    window._tfa = { email: em };
+    document.getElementById('code-sub').textContent = 'Enter the 6-digit code sent to ' + em + '. It expires in 10 minutes.';
     swTFA('code');
-    // Auto-focus the OTP input
     setTimeout(() => document.getElementById('otp')?.focus(), 300);
   } catch (err) {
-    alert('al-tfam', 'err', err.message || 'Could not send code. Please try again.');
-  } finally { ld('btn-send-code', false); }
+    const locked = rlRecord('in', document.getElementById('rl-in'));
+    if (!locked) alert('al-in', 'err', err.message || 'Sign in failed. Please try again.');
+  } finally { ld('btn-in', false); }
 }
 
 async function verifyCode() {
@@ -534,12 +469,16 @@ async function verifyCode() {
   clrAlert('al-tfac');
   ld('btn-verify', true);
   try {
-    const { error } = await sb.auth.verifyOtp({
+    const { data, error } = await sb.auth.verifyOtp({
       email: window._tfa.email,
       token: code,
       type: 'email'
     });
     if (error) throw error;
+    if (window._tfa.fn && data.user) {
+      await sb.from('members').upsert({ id: data.user.id, email: window._tfa.email, first_name: window._tfa.fn, last_name: window._tfa.ln, source: window._tfa.source || 'web_signup', created_at: new Date().toISOString() });
+      await sb.from('waitlist').delete().eq('email', window._tfa.email);
+    }
     window._sa = true; startSess(); location.href = 'dashboard.html';
   } catch (err) {
     alert('al-tfac', 'err',
@@ -551,8 +490,16 @@ async function verifyCode() {
 
 async function resendCode() {
   document.getElementById('otp').value = '';
-  swTFA('method');
-  await sendEmailCode();
+  clrAlert('al-tfac');
+  try {
+    const { error } = await sb.auth.signInWithOtp({
+      email: window._tfa.email,
+      options: { shouldCreateUser: true }
+    });
+    if (error) throw error;
+  } catch (err) {
+    alert('al-tfac', 'err', err.message || 'Could not resend code. Please try again.');
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -572,7 +519,7 @@ async function doForgot() {
   } finally { ld('btn-fp', false); }
 }
 
-if (new URLSearchParams(location.search).get('reset') === 'true') { swForgot(); alert('al-fp','ok','Enter your new password below.'); }
+if (new URLSearchParams(location.search).get('reset') === 'true') { swForgot(); }
 
 // Enter key support
 document.addEventListener('keydown', e => {
