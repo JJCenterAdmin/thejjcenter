@@ -147,6 +147,17 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .btn-support{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--p1);padding:11px 20px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;align-self:flex-start;transition:opacity .2s;}
 .btn-support:hover{opacity:.88;}
 .idealist-wrap{background:white;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:24px;}
+.listing-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--paper);text-decoration:none;}
+.listing-row:last-child{border-bottom:none;}
+.listing-row:hover .listing-title{color:var(--p4);}
+.listing-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+.listing-info{flex:1;min-width:0;}
+.listing-title{font-size:14px;font-weight:600;color:var(--p2);transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.listing-loc{font-size:12px;color:var(--muted);margin-top:1px;}
+.listing-arrow{font-size:14px;color:var(--light);flex-shrink:0;}
+.listing-fallback{text-align:center;padding:24px 0;}
+.listing-fallback p{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.btn-listing-fallback{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 22px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;}
 
 /* ── SKELETON ── */
 .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:20px;margin-bottom:8px;}
@@ -361,14 +372,14 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 
         <!-- Current Openings -->
         <div class="idealist-wrap">
-          <div class="sec-head"><div class="sec-title">Current Openings</div></div>
-          <div style="display:flex;align-items:center;gap:20px;background:linear-gradient(135deg,var(--p2),var(--p3));border-radius:14px;padding:24px 28px;flex-wrap:wrap;">
-            <div style="font-size:40px;flex-shrink:0;">🤝</div>
-            <div style="flex:1;min-width:180px;">
-              <div style="font-family:var(--serif);font-size:20px;font-weight:600;color:white;margin-bottom:4px;">11 Volunteer Opportunities</div>
-              <div style="font-size:13px;color:rgba(196,168,245,.75);line-height:1.6;">Advisory council, board members, pantry volunteers, content creators &amp; more — view all open positions on Idealist.</div>
-            </div>
-            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--p1);padding:12px 22px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;">View All Openings →</a>
+          <div class="sec-head">
+            <div class="sec-title">Current Openings</div>
+            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington?tab=VOLOP#opportunities" target="_blank" rel="noopener" class="sec-link">View all on Idealist →</a>
+          </div>
+          <div id="idealist-listings">
+            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
+            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
+            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
           </div>
         </div>
       </div>
@@ -824,6 +835,48 @@ function showSupportIfNeeded() {
   const supportTypes = ['volunteer','partner','coalition','donate','informed'];
   const hasSupport = types.some(t => supportTypes.includes(t));
   document.getElementById('support-section').style.display = hasSupport ? 'block' : 'none';
+  if (hasSupport) loadIdealistListings();
+}
+
+// ── Idealist Live Listings ──
+const IDEALIST_ORG_URL = 'https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington?tab=VOLOP#opportunities';
+
+async function loadIdealistListings() {
+  const container = document.getElementById('idealist-listings');
+  if (!container) return;
+  try {
+    const res = await fetch('/api/idealist-listings');
+    const data = await res.json();
+
+    if (data.ok && data.listings && data.listings.length > 0) {
+      container.innerHTML = data.listings.map(l => `
+        <a class="listing-row" href="${escHtml(l.url)}" target="_blank" rel="noopener">
+          <div class="listing-dot"></div>
+          <div class="listing-info">
+            <div class="listing-title">${escHtml(l.title)}</div>
+            <div class="listing-loc">${escHtml(l.location)}</div>
+          </div>
+          <div class="listing-arrow">›</div>
+        </a>`).join('');
+    } else {
+      showIdealistFallback(container);
+    }
+  } catch (_) {
+    showIdealistFallback(container);
+  }
+}
+
+function showIdealistFallback(container) {
+  container.innerHTML = `
+    <div class="listing-fallback">
+      <p>View our current volunteer openings directly on Idealist.</p>
+      <a href="${IDEALIST_ORG_URL}" target="_blank" rel="noopener" class="btn-listing-fallback">View Current Openings →</a>
+    </div>`;
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 
