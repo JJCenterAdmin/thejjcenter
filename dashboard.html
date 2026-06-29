@@ -15,87 +15,144 @@
   --cream:#faf7f4;--paper:#f3ede8;--ink:#1a1520;--muted:#6b5f78;--light:#a898b8;
   --sans:'Outfit',sans-serif;--serif:'Cormorant Garamond',serif;
   --green:#1a7a3d;--red:#b83024;
+  --sidebar-w:240px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height:100vh;}
 
 /* ── NAV ── */
-.dash-nav{background:var(--p1);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.dash-logo{font-family:var(--serif);font-size:18px;font-weight:600;color:white;text-decoration:none;}
+.dash-nav{background:var(--p1);padding:0 20px 0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.nav-left{display:flex;align-items:center;gap:12px;}
+.hamburger{background:none;border:none;cursor:pointer;padding:6px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.hamburger span{display:block;width:20px;height:2px;background:rgba(255,255,255,.7);border-radius:2px;transition:all .2s;}
+.hamburger:hover span{background:white;}
+.dash-logo{font-family:var(--serif);font-size:17px;font-weight:600;color:white;text-decoration:none;}
 .dash-logo span{font-size:10px;display:block;color:var(--p6);font-family:var(--sans);letter-spacing:.07em;text-transform:uppercase;font-weight:400;}
-.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-right{display:flex;align-items:center;gap:12px;}
 .dash-greeting{font-size:13px;color:rgba(255,255,255,.6);}
 .dash-greeting strong{color:white;}
-.btn-signout{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 16px;border-radius:100px;font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.btn-signout{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:100px;font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .2s;}
 .btn-signout:hover{border-color:rgba(255,255,255,.5);color:white;}
+@media(max-width:500px){.dash-greeting{display:none;}}
 
-/* ── LAYOUT ── */
-.dash-wrap{max-width:1100px;margin:0 auto;padding:32px 24px;}
+/* ── BODY LAYOUT ── */
+.body-wrap{display:flex;min-height:calc(100vh - 64px);position:relative;}
 
-/* ── HERO CARD (QR + welcome) ── */
-.hero-card{background:linear-gradient(135deg,var(--p2),var(--p3));border-radius:20px;padding:32px;display:flex;gap:32px;align-items:center;margin-bottom:28px;flex-wrap:wrap;}
-.hero-left{flex:1;min-width:220px;}
-.hero-tag{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--p6);font-weight:600;margin-bottom:10px;}
-.hero-name{font-family:var(--serif);font-size:clamp(28px,5vw,42px);font-weight:600;color:white;line-height:1.1;margin-bottom:8px;}
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--p1);flex-shrink:0;display:flex;flex-direction:column;padding:20px 0;position:fixed;top:64px;left:0;height:calc(100vh - 64px);overflow-y:auto;z-index:150;transform:translateX(-100%);transition:transform .25s ease;}
+.sidebar.open{transform:translateX(0);}
+@media(min-width:900px){
+  .sidebar{transform:translateX(0);}
+  .sidebar-overlay{display:none !important;}
+}
+.sidebar-overlay{display:none;position:fixed;inset:0;top:64px;background:rgba(0,0,0,.4);z-index:140;}
+.sidebar-overlay.show{display:block;}
+.sidebar-section{margin-bottom:4px;}
+.sidebar-section-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(196,168,245,.4);padding:10px 20px 4px;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,.65);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--sans);}
+.sidebar-item:hover,.sidebar-item.active{background:rgba(255,255,255,.07);color:white;}
+.sidebar-item.active{color:var(--gold2);}
+.sidebar-ic{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sidebar-arrow{margin-left:auto;font-size:10px;transition:transform .2s;color:rgba(196,168,245,.4);}
+.sidebar-item.expanded .sidebar-arrow{transform:rotate(90deg);}
+.sidebar-sub{display:none;background:rgba(0,0,0,.2);}
+.sidebar-sub.open{display:block;}
+.sidebar-sub-item{display:flex;align-items:center;gap:8px;padding:9px 20px 9px 50px;font-size:13px;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--sans);}
+.sidebar-sub-item:hover,.sidebar-sub-item.active{color:var(--gold2);background:rgba(255,255,255,.04);}
+.sidebar-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 0;}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;}
+.sidebar-version{font-size:10px;color:rgba(196,168,245,.25);text-align:center;}
+
+/* ── MAIN CONTENT ── */
+.main-content{flex:1;padding:28px 24px;transition:margin-left .25s;}
+@media(min-width:900px){.main-content{margin-left:var(--sidebar-w);}}
+
+/* ── VIEWS ── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── HERO CARD ── */
+.hero-card{background:linear-gradient(135deg,var(--p2),var(--p3));border-radius:20px;padding:28px;display:flex;gap:28px;align-items:center;margin-bottom:24px;flex-wrap:wrap;}
+.hero-left{flex:1;min-width:200px;}
+.hero-tag{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--p6);font-weight:600;margin-bottom:8px;}
+.hero-name{font-family:var(--serif);font-size:clamp(26px,4.5vw,40px);font-weight:600;color:white;line-height:1.1;margin-bottom:8px;}
 .hero-name em{color:var(--gold2);font-style:italic;}
-.hero-sub{font-size:13px;color:rgba(196,168,245,.7);line-height:1.7;margin-bottom:20px;}
+.hero-sub{font-size:13px;color:rgba(196,168,245,.7);line-height:1.7;margin-bottom:18px;}
 .hero-stat-row{display:flex;gap:20px;flex-wrap:wrap;}
 .hero-stat{text-align:center;}
-.hero-stat-n{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--gold2);}
+.hero-stat-n{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--gold2);}
 .hero-stat-l{font-size:11px;color:rgba(196,168,245,.6);letter-spacing:.06em;text-transform:uppercase;}
-.hero-qr{background:white;border-radius:16px;padding:20px;text-align:center;flex-shrink:0;}
+.hero-qr{background:white;border-radius:16px;padding:18px;text-align:center;flex-shrink:0;}
 .hero-qr canvas{display:block;margin:0 auto;}
-.hero-qr-label{font-size:11px;color:var(--muted);margin-top:10px;letter-spacing:.06em;text-transform:uppercase;}
+.hero-qr-label{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.06em;text-transform:uppercase;}
 .hero-qr-sub{font-size:10px;color:var(--light);margin-top:3px;}
 
 /* ── SECTION HEADERS ── */
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.sec-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--p2);}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--p2);}
 .sec-link{font-size:12px;color:var(--p4);text-decoration:none;font-weight:500;}
 
 /* ── GRID ── */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
 @media(max-width:700px){.grid-2{grid-template-columns:1fr;}}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
-@media(max-width:900px){.grid-3{grid-template-columns:1fr 1fr;}}
-@media(max-width:600px){.grid-3{grid-template-columns:1fr;}}
 
 /* ── CARDS ── */
-.card{background:white;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
-.card-title{font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.card{background:white;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+.card-title{font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
 
 /* ── VISIT LIST ── */
-.visit-list{display:flex;flex-direction:column;gap:10px;}
-.visit-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--paper);}
+.visit-list{display:flex;flex-direction:column;gap:8px;}
+.visit-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--paper);}
 .visit-row:last-child{border-bottom:none;}
-.visit-dot{width:10px;height:10px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+.visit-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;}
 .visit-info{flex:1;}
 .visit-date{font-size:14px;font-weight:600;color:var(--ink);}
 .visit-type{font-size:12px;color:var(--muted);}
-.visit-empty{text-align:center;padding:32px 0;color:var(--light);font-size:14px;}
+.visit-empty{text-align:center;padding:28px 0;color:var(--light);font-size:14px;}
 .visit-empty span{display:block;font-size:28px;margin-bottom:8px;}
 
 /* ── ANNOUNCEMENTS ── */
-.announce-list{display:flex;flex-direction:column;gap:12px;}
-.announce-item{padding:16px;background:var(--cream);border-radius:12px;border-left:3px solid var(--gold);}
-.announce-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.announce-list{display:flex;flex-direction:column;gap:10px;}
+.announce-item{padding:14px;background:var(--cream);border-radius:12px;border-left:3px solid var(--gold);}
+.announce-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .announce-title{font-size:14px;font-weight:600;color:var(--p2);}
 .announce-date{font-size:11px;color:var(--light);}
 .announce-body{font-size:13px;color:var(--muted);line-height:1.6;}
-.announce-empty{text-align:center;padding:32px 0;color:var(--light);font-size:14px;}
+.announce-empty{text-align:center;padding:28px 0;color:var(--light);font-size:14px;}
 
-/* ── LOADING SKELETON ──
-.pantry-card{background:linear-gradient(135deg,var(--p2),var(--p1));border-radius:16px;padding:24px;color:white;margin-bottom:28px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
-.pantry-icon{font-size:40px;flex-shrink:0;}
+/* ── PANTRY ── */
+.pantry-card{background:linear-gradient(135deg,var(--p2),var(--p1));border-radius:16px;padding:22px;color:white;margin-bottom:24px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+.pantry-icon{font-size:36px;flex-shrink:0;}
 .pantry-info{flex:1;}
-.pantry-title{font-family:var(--serif);font-size:20px;font-weight:600;color:white;margin-bottom:4px;}
-.pantry-sub{font-size:13px;color:rgba(196,168,245,.7);line-height:1.6;margin-bottom:16px;}
-.pantry-optin{display:flex;align-items:center;gap:12px;}
-.pantry-optin .toggle-label{color:white;}
-.pantry-freq{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;padding:8px 14px;border-radius:8px;font-size:13px;font-family:var(--sans);cursor:pointer;margin-left:12px;}
+.pantry-title{font-family:var(--serif);font-size:18px;font-weight:600;color:white;margin-bottom:4px;}
+.pantry-sub{font-size:13px;color:rgba(196,168,245,.7);line-height:1.6;margin-bottom:14px;}
+.pantry-optin{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.toggle-switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#4a3570;border-radius:24px;cursor:pointer;transition:.3s;}
+.toggle-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:rgba(255,255,255,.5);border-radius:50%;transition:.3s;}
+.toggle-switch input:checked+.toggle-slider{background:var(--gold);}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(18px);background:white;}
+.toggle-label{color:rgba(255,255,255,.8);font-size:13px;}
+.pantry-freq{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;padding:7px 12px;border-radius:8px;font-size:13px;font-family:var(--sans);cursor:pointer;}
 .pantry-freq option{background:var(--p2);color:white;}
 
-/* ── LOADING SKELETON ── */
+/* ── SUPPORT SECTION ── */
+.support-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+@media(max-width:600px){.support-cards{grid-template-columns:1fr;}}
+.support-card{background:white;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:12px;}
+.support-card-icon{font-size:32px;}
+.support-card-title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--p2);}
+.support-card-sub{font-size:13px;color:var(--muted);line-height:1.6;flex:1;}
+.btn-support{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--p1);padding:11px 20px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;align-self:flex-start;transition:opacity .2s;}
+.btn-support:hover{opacity:.88;}
+.idealist-wrap{background:white;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:24px;}
+.idealist-wrap iframe{border-radius:8px;display:block;width:100%;}
+.idealist-fallback{display:none;text-align:center;padding:32px 20px;}
+.idealist-fallback p{font-size:14px;color:var(--muted);margin-bottom:16px;}
+.btn-idealist-fallback{display:inline-flex;align-items:center;gap:6px;background:var(--p4);color:white;padding:11px 22px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;}
+
+/* ── SKELETON ── */
 .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:20px;margin-bottom:8px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
@@ -103,226 +160,418 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .save-banner{position:fixed;bottom:24px;right:24px;background:var(--green);color:white;padding:12px 20px;border-radius:100px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
 .save-banner.show{transform:translateY(0);opacity:1;}
 
-/* ── PROFILE CARD ── */
-.profile-card{background:white;border-radius:16px;border:1px solid #e4ddf0;padding:28px;margin-bottom:28px;}
-.profile-card-title{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--p2);margin-bottom:4px;}
-.profile-card-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
-.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+/* ── PROFILE VIEW ── */
+.view-header{margin-bottom:24px;}
+.view-title{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--p2);margin-bottom:4px;}
+.view-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+.profile-card{background:white;border-radius:16px;border:1px solid #e4ddf0;padding:26px;margin-bottom:20px;}
+.profile-card-title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--p2);margin-bottom:4px;}
+.profile-card-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 @media(max-width:600px){.profile-grid{grid-template-columns:1fr;}}
-.pf-group{display:flex;flex-direction:column;gap:6px;}
+.pf-group{display:flex;flex-direction:column;gap:5px;}
 .pf-group label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
-.pf-group input,.pf-group select{padding:11px 14px;border:1.5px solid #e4ddf0;border-radius:10px;font-size:14px;font-family:var(--sans);color:var(--ink);background:white;transition:border-color .2s;}
+.pf-group input,.pf-group select{padding:10px 13px;border:1.5px solid #e4ddf0;border-radius:10px;font-size:14px;font-family:var(--sans);color:var(--ink);background:white;transition:border-color .2s;}
 .pf-group input:focus,.pf-group select:focus{outline:none;border-color:var(--p4);}
 .pf-group input:disabled{background:#f9f7ff;color:var(--muted);}
 .pf-hint{font-size:11px;color:var(--light);margin-top:2px;}
-.profile-actions{display:flex;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap;}
-.btn-save-profile{background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 24px;border-radius:100px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);transition:opacity .2s;}
+.profile-actions{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap;}
+.btn-save-profile{background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 22px;border-radius:100px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);transition:opacity .2s;}
 .btn-save-profile:hover{opacity:.88;}
 .btn-save-profile:disabled{opacity:.5;cursor:not-allowed;}
-.pw-change-toggle{font-size:13px;color:var(--p4);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:var(--sans);}
-.pw-change-section{display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e4ddf0;}
+.pw-change-section{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #e4ddf0;}
 .pw-change-section.open{display:block;}
 
-/* ── PROFILE COMPLETION POPUP ── */
-.profile-popup-overlay{position:fixed;inset:0;background:rgba(22,8,43,.6);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .3s;}
-.profile-popup-overlay.show{opacity:1;}
-.profile-popup{background:white;border-radius:20px;padding:36px;max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.25);transform:translateY(20px);transition:transform .3s;}
-.profile-popup-overlay.show .profile-popup{transform:translateY(0);}
-.popup-icon{font-size:44px;margin-bottom:16px;display:block;}
-.popup-title{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--p2);margin-bottom:8px;}
-.popup-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
-.popup-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
-.popup-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
-.popup-field input,.popup-field select{width:100%;padding:11px 14px;border:1.5px solid #e4ddf0;border-radius:10px;font-size:14px;font-family:var(--sans);color:var(--ink);}
-.popup-field input:focus,.popup-field select:focus{outline:none;border-color:var(--p4);}
-.popup-actions{display:flex;gap:10px;flex-wrap:wrap;}
-.btn-popup-save{flex:1;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:13px;border-radius:100px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);}
-.btn-popup-skip{background:transparent;color:var(--muted);padding:13px 20px;border-radius:100px;font-size:13px;border:1px solid #e4ddf0;cursor:pointer;font-family:var(--sans);}
+/* ── CONNECTION TYPE CHECKBOXES (profile/selections) ── */
+.connect-group{display:flex;flex-direction:column;gap:8px;}
+.chk-item{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border:1.5px solid #e4ddf0;border-radius:10px;cursor:pointer;transition:border-color .2s,background .2s;background:white;}
+.chk-item:hover{border-color:var(--p4);background:#f8f5ff;}
+.chk-item input[type=checkbox]{width:16px;height:16px;margin-top:1px;accent-color:var(--p4);flex-shrink:0;cursor:pointer;}
+.chk-item-label{font-size:13px;color:var(--ink);line-height:1.4;}
+.food-extra{display:none;background:#faf5ff;border:1.5px solid rgba(90,45,168,.2);border-radius:12px;padding:14px;margin-top:8px;}
+.food-extra.show{display:block;}
+
+/* ── PASSWORD VIEW ── */
+.pw-view-card{background:white;border-radius:16px;border:1px solid #e4ddf0;padding:26px;max-width:480px;}
+
+/* ── FOOD ASSISTANCE POPUP ── */
+.fa-popup-overlay{position:fixed;inset:0;background:rgba(22,8,43,.65);backdrop-filter:blur(4px);z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;}
+.fa-popup-overlay.show{display:flex;}
+.fa-popup{background:white;border-radius:20px;padding:34px;max-width:460px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.3);}
+.fa-popup-icon{font-size:42px;margin-bottom:14px;display:block;}
+.fa-popup-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--p2);margin-bottom:8px;}
+.fa-popup-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;}
+.fa-popup-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
+.fa-popup-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.fa-popup-field input,.fa-popup-field select{width:100%;padding:10px 13px;border:1.5px solid #e4ddf0;border-radius:10px;font-size:14px;font-family:var(--sans);color:var(--ink);}
+.fa-popup-field input:focus,.fa-popup-field select:focus{outline:none;border-color:var(--p4);}
+.fa-popup-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-fa-save{flex:1;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:12px;border-radius:100px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);}
+.btn-fa-skip{background:transparent;color:var(--muted);padding:12px 18px;border-radius:100px;font-size:13px;border:1px solid #e4ddf0;cursor:pointer;font-family:var(--sans);}
+.fa-popup-link{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--p4);cursor:pointer;text-decoration:underline;}
+
+/* ── ALERT ── */
+.inline-alert{display:none;border-radius:10px;padding:10px 13px;font-size:13px;margin-bottom:13px;line-height:1.6;}
+.inline-alert.show{display:block;}
+.inline-alert.err{background:#fdf0ee;border:1px solid #c0392b;color:#8b1e14;}
+.inline-alert.ok{background:#edfaf2;border:1px solid #2e9a5e;color:#145a32;}
 </style>
 </head>
 <body>
 
-<!-- PROFILE COMPLETION POPUP -->
-<div class="profile-popup-overlay" id="profile-popup-overlay">
-  <div class="profile-popup">
-    <span class="popup-icon">👋</span>
-    <h2 class="popup-title">Help us serve you better</h2>
-    <p class="popup-sub">Your ZIP code and household size help us plan food quantities and track our community impact. Takes 30 seconds.</p>
-    <div class="popup-fields">
-      <div class="popup-field">
-        <label>ZIP Code</label>
-        <input type="text" id="popup-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
+<!-- FOOD ASSISTANCE MISSING INFO POPUP -->
+<div class="fa-popup-overlay" id="fa-popup-overlay">
+  <div class="fa-popup">
+    <span class="fa-popup-icon">🛒</span>
+    <h2 class="fa-popup-title">Complete Your Food Assistance Info</h2>
+    <p class="fa-popup-sub">Your account is set up for food assistance but is missing your ZIP code and/or household size. This helps us plan quantities and serve your family better.</p>
+    <div class="fa-popup-fields">
+      <div class="fa-popup-field">
+        <label>ZIP Code *</label>
+        <input type="text" id="fa-popup-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
       </div>
-      <div class="popup-field">
-        <label>Household Size</label>
-        <select id="popup-household">
+      <div class="fa-popup-field">
+        <label>Household Size *</label>
+        <select id="fa-popup-household">
           <option value="" disabled selected>Select...</option>
           <option value="1">1 person</option>
           <option value="2">2 people</option>
-          <option value="3-4">3–4 people</option>
-          <option value="5-6">5–6 people</option>
-          <option value="7+">7+ people</option>
+          <option value="3">3 people</option>
+          <option value="4">4 people</option>
+          <option value="5">5 people</option>
+          <option value="6">6 people</option>
+          <option value="7">7 people</option>
+          <option value="8">8+ people</option>
         </select>
       </div>
     </div>
-    <div class="popup-actions">
-      <button class="btn-popup-save" onclick="saveProfilePopup()">Save & Continue →</button>
-      <button class="btn-popup-skip" onclick="dismissPopup()">Maybe later</button>
+    <div class="fa-popup-actions">
+      <button class="btn-fa-save" onclick="saveFAPopup()">Save &amp; Continue →</button>
+      <button class="btn-fa-skip" onclick="dismissFAPopup()">Maybe later</button>
     </div>
+    <span class="fa-popup-link" onclick="dismissFAPopup();showView('profile')">Go to my Profile to update →</span>
   </div>
 </div>
 
 <!-- NAV -->
 <nav class="dash-nav">
-  <a href="index.html" class="dash-logo">The JJ Center<span>Member Dashboard</span></a>
+  <div class="nav-left">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="dash-logo">The JJ Center<span>Member Dashboard</span></a>
+  </div>
   <div class="nav-right">
     <span class="dash-greeting">Welcome, <strong id="nav-name">...</strong></span>
     <button class="btn-signout" onclick="signOut()">Sign Out</button>
   </div>
 </nav>
 
-<!-- DASHBOARD -->
-<div class="dash-wrap" id="dash-content" style="display:none;">
+<div class="body-wrap">
 
-  <!-- HERO QR CARD -->
-  <div class="hero-card">
-    <div class="hero-left">
-      <p class="hero-tag">Member Since <span id="member-since">...</span></p>
-      <h1 class="hero-name">Good to see you,<br><em id="hero-name">...</em></h1>
-      <p class="hero-sub">Scan your QR code at the welcome desk to check in — no lines, no paper.</p>
-      <div class="hero-stat-row">
-        <div class="hero-stat">
-          <div class="hero-stat-n" id="stat-visits">0</div>
-          <div class="hero-stat-l">Visits</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Account</div>
+      <button class="sidebar-item" id="nav-account" onclick="toggleNavGroup('account')">
+        <span class="sidebar-ic">👤</span> Account
+        <span class="sidebar-arrow" id="arr-account">›</span>
+      </button>
+      <div class="sidebar-sub" id="sub-account">
+        <button class="sidebar-sub-item" onclick="showView('profile')">· Profile</button>
+        <button class="sidebar-sub-item" onclick="showView('selections')">· My Selections</button>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Settings</div>
+      <button class="sidebar-item" id="nav-settings" onclick="toggleNavGroup('settings')">
+        <span class="sidebar-ic">⚙️</span> Settings
+        <span class="sidebar-arrow" id="arr-settings">›</span>
+      </button>
+      <div class="sidebar-sub" id="sub-settings">
+        <button class="sidebar-sub-item" onclick="showView('password')">· Change Password</button>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <button class="sidebar-item" onclick="showView('home')">
+        <span class="sidebar-ic">🏠</span> Dashboard Home
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-version">The JJ Center · Ward 8, DC</div>
+    </div>
+  </aside>
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content" id="main-content">
+
+    <!-- LOADING STATE -->
+    <div id="dash-loading" style="display:flex;align-items:center;justify-content:center;height:60vh;">
+      <div style="text-align:center;">
+        <div style="font-size:40px;margin-bottom:16px;">⏳</div>
+        <p style="color:var(--muted);font-size:14px;">Loading your dashboard...</p>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: HOME ══ -->
+    <div class="view" id="view-home">
+
+      <!-- HERO QR CARD -->
+      <div class="hero-card">
+        <div class="hero-left">
+          <p class="hero-tag">Member Since <span id="member-since">...</span></p>
+          <h1 class="hero-name">Good to see you,<br><em id="hero-name">...</em></h1>
+          <p class="hero-sub">Scan your QR code at the welcome desk to check in — no lines, no paper.</p>
+          <div class="hero-stat-row">
+            <div class="hero-stat">
+              <div class="hero-stat-n" id="stat-visits">0</div>
+              <div class="hero-stat-l">Visits</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-n" id="stat-days">0</div>
+              <div class="hero-stat-l">Days as Member</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-qr">
+          <canvas id="qr-canvas"></canvas>
+          <div class="hero-qr-label">Your Check-In Code</div>
+          <div class="hero-qr-sub">Show at the welcome desk</div>
+        </div>
+      </div>
+
+      <!-- SUPPORT SECTION (shown for non-food-only users) -->
+      <div id="support-section" style="display:none;">
+        <div class="sec-head"><div class="sec-title">How to Support The JJ Center</div></div>
+        <div class="support-cards">
+          <div class="support-card">
+            <div class="support-card-icon">💰</div>
+            <div class="support-card-title">Donate</div>
+            <div class="support-card-sub">Support our community — every dollar helps us provide food, health resources, and connections for Ward 8 neighbors.</div>
+            <a href="https://givebutter.com/thejjcenter" target="_blank" rel="noopener" class="btn-support">Support our community →</a>
+          </div>
+          <div class="support-card">
+            <div class="support-card-icon">🤝</div>
+            <div class="support-card-title">Volunteer</div>
+            <div class="support-card-sub">Join our team and help us make a real difference in Ward 8. Browse open volunteer positions on Idealist.</div>
+            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" rel="noopener" class="btn-support">Join our team →</a>
+          </div>
         </div>
 
-        <div class="hero-stat">
-          <div class="hero-stat-n" id="stat-days">0</div>
-          <div class="hero-stat-l">Days as Member</div>
+        <!-- Idealist Embed -->
+        <div class="idealist-wrap">
+          <div class="sec-head"><div class="sec-title">Current Openings</div></div>
+          <iframe
+            id="idealist-iframe"
+            src="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington/embed"
+            width="100%"
+            height="600"
+            frameborder="0"
+            style="border-radius:8px;"
+            title="The JJ Center volunteer openings on Idealist"
+            onload="iframeLoaded()"
+            onerror="iframeFailed()">
+          </iframe>
+          <div class="idealist-fallback" id="idealist-fallback">
+            <p>View our current openings on Idealist to see how you can help.</p>
+            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" rel="noopener" class="btn-idealist-fallback">View Current Openings →</a>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="hero-qr">
-      <canvas id="qr-canvas"></canvas>
-      <div class="hero-qr-label">Your Check-In Code</div>
-      <div class="hero-qr-sub">Show at the welcome desk</div>
-    </div>
-  </div>
 
-  <!-- MY PROFILE -->
-  <div class="profile-card">
-    <h3 class="profile-card-title">My Profile</h3>
-    <p class="profile-card-sub">Keep your information up to date so we can serve you better.</p>
-    <div class="profile-grid">
-      <div class="pf-group">
-        <label>First Name</label>
-        <input type="text" id="pf-fn" placeholder="First name">
+      <!-- PANTRY OPT-IN -->
+      <div class="pantry-card" id="pantry-optin-card">
+        <div class="pantry-icon">🥦</div>
+        <div class="pantry-info">
+          <h3 class="pantry-title">Food Pantry Notifications</h3>
+          <p class="pantry-sub">Get notified about pantry days, schedule changes, and special distributions.</p>
+          <div class="pantry-optin">
+            <label class="toggle-switch"><input type="checkbox" id="pantry-toggle" onchange="savePantryPref()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Notify me about pantry events</span>
+            <select class="pantry-freq" id="pantry-freq" onchange="savePantryPref()">
+              <option value="all">Every event</option>
+              <option value="weekly">Weekly digest</option>
+              <option value="urgent">Urgent only</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="pf-group">
-        <label>Last Name</label>
-        <input type="text" id="pf-ln" placeholder="Last name">
+
+      <!-- MAIN GRID: VISITS + ANNOUNCEMENTS -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="sec-head">
+            <div class="card-title">Visit History</div>
+            <a href="checkin.html" class="sec-link">Check in now →</a>
+          </div>
+          <div class="visit-list" id="visit-list">
+            <div class="skeleton" style="height:44px;"></div>
+            <div class="skeleton" style="height:44px;"></div>
+            <div class="skeleton" style="height:44px;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Announcements from Dr. Roach</div>
+          <div class="announce-list" id="announce-list">
+            <div class="skeleton" style="height:76px;"></div>
+            <div class="skeleton" style="height:76px;"></div>
+          </div>
+        </div>
       </div>
-      <div class="pf-group">
-        <label>Email Address</label>
-        <input type="email" id="pf-em" disabled>
-        <div class="pf-hint">Email cannot be changed here — contact hello@jjcenter.org</div>
+    </div><!-- end view-home -->
+
+    <!-- ══ VIEW: PROFILE ══ -->
+    <div class="view" id="view-profile">
+      <div class="view-header">
+        <div class="view-title">My Profile</div>
+        <div class="view-sub">Keep your information up to date so we can serve you better.</div>
       </div>
-      <div class="pf-group">
-        <label>Phone Number</label>
-        <input type="tel" id="pf-phone" placeholder="(202) 555-0000" inputmode="tel">
+      <div id="profile-alert" class="inline-alert"></div>
+      <div class="profile-card">
+        <h3 class="profile-card-title">Personal Information</h3>
+        <p class="profile-card-sub">Edit your name, email, and contact details.</p>
+        <div class="profile-grid">
+          <div class="pf-group">
+            <label>First Name</label>
+            <input type="text" id="pf-fn" placeholder="First name">
+          </div>
+          <div class="pf-group">
+            <label>Last Name</label>
+            <input type="text" id="pf-ln" placeholder="Last name">
+          </div>
+          <div class="pf-group">
+            <label>Email Address</label>
+            <input type="email" id="pf-em" disabled>
+            <div class="pf-hint">Email cannot be changed here — contact hello@jjcenter.org</div>
+          </div>
+          <div class="pf-group">
+            <label>Phone Number</label>
+            <input type="tel" id="pf-phone" placeholder="(202) 555-0000" inputmode="tel">
+          </div>
+        </div>
+        <!-- Food assistance fields (shown when food_assistance is in user_types) -->
+        <div id="pf-food-section" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #e4ddf0;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">🛒 Food Assistance Details</div>
+          <div class="profile-grid">
+            <div class="pf-group">
+              <label>ZIP Code</label>
+              <input type="text" id="pf-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
+            </div>
+            <div class="pf-group">
+              <label>Household Size</label>
+              <select id="pf-household">
+                <option value="">Select...</option>
+                <option value="1">1 person</option>
+                <option value="2">2 people</option>
+                <option value="3">3 people</option>
+                <option value="4">4 people</option>
+                <option value="5">5 people</option>
+                <option value="6">6 people</option>
+                <option value="7">7 people</option>
+                <option value="8">8+ people</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-save-profile" id="btn-save-profile" onclick="saveProfile()">Save Changes</button>
+        </div>
       </div>
-      <div class="pf-group">
-        <label>ZIP Code</label>
-        <input type="text" id="pf-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
+    </div><!-- end view-profile -->
+
+    <!-- ══ VIEW: MY SELECTIONS ══ -->
+    <div class="view" id="view-selections">
+      <div class="view-header">
+        <div class="view-title">My Selections</div>
+        <div class="view-sub">Update how you'd like to connect with The JJ Center. Changes are saved immediately.</div>
       </div>
-      <div class="pf-group">
-        <label>Household Size</label>
-        <select id="pf-household">
-          <option value="" disabled>Select...</option>
-          <option value="1">1 person</option>
-          <option value="2">2 people</option>
-          <option value="3-4">3–4 people</option>
-          <option value="5-6">5–6 people</option>
-          <option value="7+">7+ people</option>
-        </select>
+      <div id="selections-alert" class="inline-alert"></div>
+      <div class="profile-card">
+        <h3 class="profile-card-title">Connection Types</h3>
+        <p class="profile-card-sub">Check all that apply — you can change these at any time.</p>
+        <div class="connect-group">
+          <label class="chk-item">
+            <input type="checkbox" name="sel_type" value="food_assistance" onchange="toggleFoodExtra()">
+            <span class="chk-item-label">🛒 I need food assistance</span>
+          </label>
+          <label class="chk-item">
+            <input type="checkbox" name="sel_type" value="volunteer">
+            <span class="chk-item-label">🤝 I want to volunteer</span>
+          </label>
+          <label class="chk-item">
+            <input type="checkbox" name="sel_type" value="partner">
+            <span class="chk-item-label">🏢 I'm a community partner or organization</span>
+          </label>
+          <label class="chk-item">
+            <input type="checkbox" name="sel_type" value="coalition">
+            <span class="chk-item-label">🩺 Interested in the Cornerstone Care Coalition</span>
+          </label>
+          <label class="chk-item">
+            <input type="checkbox" name="sel_type" value="donate">
+            <span class="chk-item-label">💰 I want to donate or support financially</span>
+          </label>
+          <label class="chk-item">
+            <input type="checkbox" name="sel_type" value="informed">
+            <span class="chk-item-label">📬 I just want to stay informed</span>
+          </label>
+        </div>
+        <!-- Food extra fields -->
+        <div class="food-extra" id="sel-food-extra">
+          <p style="font-size:12px;color:var(--p3);margin-bottom:10px;font-weight:600;">🛒 Food Assistance Details</p>
+          <div class="profile-grid">
+            <div class="pf-group">
+              <label>ZIP Code</label>
+              <input type="text" id="sel-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5">
+            </div>
+            <div class="pf-group">
+              <label>Household Size</label>
+              <select id="sel-household">
+                <option value="">Select...</option>
+                <option value="1">1 person</option>
+                <option value="2">2 people</option>
+                <option value="3">3 people</option>
+                <option value="4">4 people</option>
+                <option value="5">5 people</option>
+                <option value="6">6 people</option>
+                <option value="7">7 people</option>
+                <option value="8">8+ people</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-save-profile" id="btn-save-selections" onclick="saveSelections()">Save Selections</button>
+        </div>
       </div>
-    </div>
-    <div class="profile-actions">
-      <button class="btn-save-profile" id="btn-save-profile" onclick="saveProfile()">Save Changes</button>
-      <button class="pw-change-toggle" onclick="togglePwChange()">Change Password</button>
-    </div>
-    <div class="pw-change-section" id="pw-change-section">
-      <div class="profile-grid">
-        <div class="pf-group">
+    </div><!-- end view-selections -->
+
+    <!-- ══ VIEW: CHANGE PASSWORD ══ -->
+    <div class="view" id="view-password">
+      <div class="view-header">
+        <div class="view-title">Change Password</div>
+        <div class="view-sub">Choose a new password for your account.</div>
+      </div>
+      <div id="pw-alert" class="inline-alert"></div>
+      <div class="pw-view-card">
+        <div class="pf-group" style="margin-bottom:14px;">
           <label>New Password</label>
           <input type="password" id="pf-pw1" placeholder="At least 8 characters">
         </div>
-        <div class="pf-group">
+        <div class="pf-group" style="margin-bottom:18px;">
           <label>Confirm New Password</label>
           <input type="password" id="pf-pw2" placeholder="Repeat new password">
         </div>
-      </div>
-      <div style="margin-top:12px;">
         <button class="btn-save-profile" onclick="savePassword()">Update Password</button>
       </div>
-    </div>
-  </div>
+    </div><!-- end view-password -->
 
-  <!-- PANTRY OPT-IN -->
-  <div class="pantry-card" id="pantry-optin-card">
-    <div class="pantry-icon">🥦</div>
-    <div class="pantry-info">
-      <h3 class="pantry-title">Food Pantry Notifications</h3>
-      <p class="pantry-sub">Get notified about pantry days, schedule changes, and special distributions.</p>
-      <div class="pantry-optin">
-        <label class="toggle-switch"><input type="checkbox" id="pantry-toggle" onchange="savePantryPref()"><span class="toggle-slider"></span></label>
-        <span class="toggle-label">Notify me about pantry events</span>
-        <select class="pantry-freq" id="pantry-freq" onchange="savePantryPref()">
-          <option value="all">Every event</option>
-          <option value="weekly">Weekly digest</option>
-          <option value="urgent">Urgent only</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN GRID: VISITS + ANNOUNCEMENTS -->
-  <div class="grid-2">
-    <!-- Visit History -->
-    <div class="card">
-      <div class="sec-head">
-        <div class="card-title">Visit History</div>
-        <a href="checkin.html" class="sec-link">Check in now →</a>
-      </div>
-      <div class="visit-list" id="visit-list">
-        <div class="skeleton" style="height:48px;"></div>
-        <div class="skeleton" style="height:48px;"></div>
-        <div class="skeleton" style="height:48px;"></div>
-      </div>
-    </div>
-
-    <!-- Announcements -->
-    <div class="card">
-      <div class="card-title">Announcements from Dr. Roach</div>
-      <div class="announce-list" id="announce-list">
-        <div class="skeleton" style="height:80px;"></div>
-        <div class="skeleton" style="height:80px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- COMING SOON: Health & Wellness Program -->
-  <!-- Feature paused pending HIPAA BAA — will be activated in a future update -->
-
-</div>
-
-<!-- LOADING STATE -->
-<div id="dash-loading" style="display:flex;align-items:center;justify-content:center;height:60vh;">
-  <div style="text-align:center;">
-    <div style="font-size:40px;margin-bottom:16px;">⏳</div>
-    <p style="color:var(--muted);font-size:14px;">Loading your dashboard...</p>
-  </div>
-</div>
+  </main><!-- end main-content -->
+</div><!-- end body-wrap -->
 
 <div class="save-banner" id="save-banner">✅ Saved!</div>
 
@@ -345,7 +594,6 @@ async function init() {
 }
 
 async function loadDashboard() {
-  // Load member profile
   const { data: member } = await sb.from('members').select('*').eq('id', currentUser.id).single();
   memberData = member || { first_name: currentUser.user_metadata?.first_name || 'Friend', last_name: '' };
 
@@ -353,25 +601,24 @@ async function loadDashboard() {
   document.getElementById('nav-name').textContent = fname;
   document.getElementById('hero-name').textContent = fname;
 
-  // Member since
   const created = new Date(currentUser.created_at);
   document.getElementById('member-since').textContent = created.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('stat-days').textContent = Math.floor((Date.now() - created) / 86400000);
 
-  // Days as member
-  const days = Math.floor((Date.now() - created) / 86400000);
-  document.getElementById('stat-days').textContent = days;
-
-  // Generate QR code (links to checkin page with member ID)
   QRCode.toCanvas(document.getElementById('qr-canvas'),
     `${location.origin}/checkin.html?mid=${currentUser.id}`,
-    { width: 140, margin: 1, color: { dark: '#2a1052', light: '#ffffff' } }
+    { width: 130, margin: 1, color: { dark: '#2a1052', light: '#ffffff' } }
   );
 
-  // Load all data in parallel
-  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfile()]);
+  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData()]);
+
+  // Check food assistance popup
+  checkFAPopup();
+  // Show support section for relevant user types
+  showSupportIfNeeded();
 
   document.getElementById('dash-loading').style.display = 'none';
-  document.getElementById('dash-content').style.display = 'block';
+  showView('home');
 }
 
 // ── Visit History ──
@@ -379,9 +626,7 @@ async function loadVisits() {
   const { data: visits } = await sb.from('visits')
     .select('*').eq('member_id', currentUser.id)
     .order('visited_at', { ascending: false }).limit(8);
-
   document.getElementById('stat-visits').textContent = visits?.length || 0;
-
   const list = document.getElementById('visit-list');
   if (!visits || visits.length === 0) {
     list.innerHTML = `<div class="visit-empty"><span>📅</span>No visits yet.<br><small>Scan the QR code at the welcome desk to check in.</small></div>`;
@@ -391,13 +636,7 @@ async function loadVisits() {
     const d = new Date(v.visited_at);
     const date = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
     const time = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    return `<div class="visit-row">
-      <div class="visit-dot"></div>
-      <div class="visit-info">
-        <div class="visit-date">${date}</div>
-        <div class="visit-type">${time} · ${v.visit_type || 'Pantry Visit'}</div>
-      </div>
-    </div>`;
+    return `<div class="visit-row"><div class="visit-dot"></div><div class="visit-info"><div class="visit-date">${date}</div><div class="visit-type">${time} · ${v.visit_type || 'Pantry Visit'}</div></div></div>`;
   }).join('');
 }
 
@@ -406,7 +645,6 @@ async function loadAnnouncements() {
   const { data: posts } = await sb.from('announcements')
     .select('*').eq('published', true)
     .order('published_at', { ascending: false }).limit(5);
-
   const list = document.getElementById('announce-list');
   if (!posts || posts.length === 0) {
     list.innerHTML = `<div class="announce-empty">No announcements yet. Check back soon!</div>`;
@@ -414,115 +652,17 @@ async function loadAnnouncements() {
   }
   list.innerHTML = posts.map(p => {
     const d = new Date(p.published_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    return `<div class="announce-item">
-      <div class="announce-head">
-        <div class="announce-title">${p.title}</div>
-        <div class="announce-date">${d}</div>
-      </div>
-      <div class="announce-body">${p.body}</div>
-    </div>`;
+    return `<div class="announce-item"><div class="announce-head"><div class="announce-title">${p.title}</div><div class="announce-date">${d}</div></div><div class="announce-body">${p.body}</div></div>`;
   }).join('');
 }
 
-// ── UI helpers ──
-// ═══════════════════════════════════════════════
-// PROFILE — Load & Save
-// ═══════════════════════════════════════════════
-async function loadProfile() {
-  const { data } = await sb.from('members')
-    .select('first_name,last_name,email,phone,zip_code,household_size')
-    .eq('id', currentUser.id).single();
-  if (!data) return;
-  document.getElementById('pf-fn').value        = data.first_name    || '';
-  document.getElementById('pf-ln').value        = data.last_name     || '';
-  document.getElementById('pf-em').value        = data.email         || currentUser.email || '';
-  document.getElementById('pf-phone').value     = data.phone         || '';
-  document.getElementById('pf-zip').value       = data.zip_code      || '';
-  const hh = document.getElementById('pf-household');
-  if (data.household_size) hh.value = data.household_size;
-
-  // Check if profile incomplete — show popup after 10 seconds
-  if (!data.zip_code || !data.household_size) {
-    setTimeout(showProfilePopup, 10000);
-  }
-}
-
-async function saveProfile() {
-  const btn = document.getElementById('btn-save-profile');
-  btn.disabled = true; btn.textContent = 'Saving...';
-  const { error } = await sb.from('members').update({
-    first_name:     document.getElementById('pf-fn').value.trim(),
-    last_name:      document.getElementById('pf-ln').value.trim(),
-    phone:          document.getElementById('pf-phone').value.trim() || null,
-    zip_code:       document.getElementById('pf-zip').value.trim()   || null,
-    household_size: document.getElementById('pf-household').value    || null,
-    updated_at:     new Date().toISOString()
-  }).eq('id', currentUser.id);
-  btn.disabled = false; btn.textContent = 'Save Changes';
-  if (error) { alert('Could not save changes: ' + error.message); return; }
-  showBanner();
-  // Update nav name
-  document.getElementById('nav-name').textContent = document.getElementById('pf-fn').value || 'Member';
-  document.getElementById('hero-name').textContent = document.getElementById('pf-fn').value || 'Friend';
-}
-
-async function savePassword() {
-  const pw1 = document.getElementById('pf-pw1').value;
-  const pw2 = document.getElementById('pf-pw2').value;
-  if (!pw1) { alert('Please enter a new password.'); return; }
-  if (pw1.length < 8) { alert('Password must be at least 8 characters.'); return; }
-  if (pw1 !== pw2) { alert('Passwords do not match.'); return; }
-  const { error } = await sb.auth.updateUser({ password: pw1 });
-  if (error) { alert('Could not update password: ' + error.message); return; }
-  document.getElementById('pf-pw1').value = '';
-  document.getElementById('pf-pw2').value = '';
-  document.getElementById('pw-change-section').classList.remove('open');
-  showBanner();
-}
-
-function togglePwChange() {
-  document.getElementById('pw-change-section').classList.toggle('open');
-}
-
-// ═══════════════════════════════════════════════
-// PROFILE COMPLETION POPUP
-// ═══════════════════════════════════════════════
-function showProfilePopup() {
-  const overlay = document.getElementById('profile-popup-overlay');
-  overlay.style.display = 'flex';
-  setTimeout(() => overlay.classList.add('show'), 10);
-}
-
-function dismissPopup() {
-  const overlay = document.getElementById('profile-popup-overlay');
-  overlay.classList.remove('show');
-  setTimeout(() => overlay.style.display = 'none', 300);
-}
-
-async function saveProfilePopup() {
-  const zip       = document.getElementById('popup-zip').value.trim();
-  const household = document.getElementById('popup-household').value;
-  if (!zip && !household) { dismissPopup(); return; }
-  await sb.from('members').update({
-    zip_code:       zip       || null,
-    household_size: household || null,
-    updated_at:     new Date().toISOString()
-  }).eq('id', currentUser.id);
-  // Also update the profile fields if visible
-  if (zip)       document.getElementById('pf-zip').value = zip;
-  if (household) document.getElementById('pf-household').value = household;
-  dismissPopup();
-  showBanner();
-}
-
-// ── UI helpers ──
+// ── Pantry Prefs ──
 async function loadPantryPrefs() {
   const { data } = await sb.from('members').select('pantry_optin,pantry_freq').eq('id', currentUser.id).single();
   if (!data) return;
   document.getElementById('pantry-toggle').checked = !!data.pantry_optin;
   if (data.pantry_freq) document.getElementById('pantry-freq').value = data.pantry_freq;
 }
-
 async function savePantryPref() {
   await sb.from('members').update({
     pantry_optin: document.getElementById('pantry-toggle').checked,
@@ -531,10 +671,236 @@ async function savePantryPref() {
   showBanner();
 }
 
+// ── Load Profile Data ──
+async function loadProfileData() {
+  const { data } = await sb.from('members')
+    .select('first_name,last_name,email,phone,zip_code,household_size,user_types')
+    .eq('id', currentUser.id).single();
+  if (!data) return;
+
+  // Profile view
+  document.getElementById('pf-fn').value    = data.first_name || '';
+  document.getElementById('pf-ln').value    = data.last_name  || '';
+  document.getElementById('pf-em').value    = data.email      || currentUser.email || '';
+  document.getElementById('pf-phone').value = data.phone      || '';
+  document.getElementById('pf-zip').value   = data.zip_code   || '';
+  const hh = document.getElementById('pf-household');
+  if (data.household_size) hh.value = String(data.household_size);
+
+  // Show food section on profile if they have food_assistance
+  const types = data.user_types || [];
+  if (types.includes('food_assistance')) {
+    document.getElementById('pf-food-section').style.display = 'block';
+  }
+
+  // Selections view — pre-check boxes
+  document.querySelectorAll('input[name="sel_type"]').forEach(cb => {
+    cb.checked = types.includes(cb.value);
+    cb.closest('.chk-item').classList.toggle('checked', cb.checked);
+  });
+  document.getElementById('sel-zip').value       = data.zip_code       || '';
+  const selHH = document.getElementById('sel-household');
+  if (data.household_size) selHH.value = String(data.household_size);
+  if (types.includes('food_assistance')) {
+    document.getElementById('sel-food-extra').classList.add('show');
+  }
+}
+
+// ── Save Profile ──
+async function saveProfile() {
+  const btn = document.getElementById('btn-save-profile');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const types = memberData?.user_types || [];
+  const update = {
+    first_name: document.getElementById('pf-fn').value.trim(),
+    last_name:  document.getElementById('pf-ln').value.trim(),
+    phone:      document.getElementById('pf-phone').value.trim() || null,
+    updated_at: new Date().toISOString()
+  };
+  if (types.includes('food_assistance')) {
+    update.zip_code       = document.getElementById('pf-zip').value.trim() || null;
+    update.household_size = document.getElementById('pf-household').value  || null;
+  }
+  const { error } = await sb.from('members').update(update).eq('id', currentUser.id);
+  btn.disabled = false; btn.textContent = 'Save Changes';
+  if (error) {
+    showInlineAlert('profile-alert', 'err', 'Could not save: ' + error.message);
+    return;
+  }
+  memberData = { ...memberData, ...update };
+  document.getElementById('nav-name').textContent  = update.first_name || 'Member';
+  document.getElementById('hero-name').textContent = update.first_name || 'Friend';
+  showInlineAlert('profile-alert', 'ok', 'Profile saved successfully!');
+  showBanner();
+}
+
+// ── Save Selections ──
+function toggleFoodExtra() {
+  const checked = document.querySelector('input[name="sel_type"][value="food_assistance"]').checked;
+  document.getElementById('sel-food-extra').classList.toggle('show', checked);
+}
+
+async function saveSelections() {
+  const btn = document.getElementById('btn-save-selections');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const types = Array.from(document.querySelectorAll('input[name="sel_type"]:checked')).map(c => c.value);
+  if (types.length === 0) {
+    btn.disabled = false; btn.textContent = 'Save Selections';
+    showInlineAlert('selections-alert', 'err', 'Please select at least one connection type.');
+    return;
+  }
+  const update = {
+    user_types: types,
+    updated_at: new Date().toISOString()
+  };
+  if (types.includes('food_assistance')) {
+    update.zip_code       = document.getElementById('sel-zip').value.trim()       || null;
+    update.household_size = document.getElementById('sel-household').value         || null;
+  } else {
+    update.zip_code       = null;
+    update.household_size = null;
+  }
+  const { error } = await sb.from('members').update(update).eq('id', currentUser.id);
+  btn.disabled = false; btn.textContent = 'Save Selections';
+  if (error) {
+    showInlineAlert('selections-alert', 'err', 'Could not save: ' + error.message);
+    return;
+  }
+  memberData = { ...memberData, ...update };
+  // Sync food section on profile view
+  document.getElementById('pf-food-section').style.display = types.includes('food_assistance') ? 'block' : 'none';
+  if (types.includes('food_assistance')) {
+    document.getElementById('pf-zip').value = update.zip_code || '';
+    const pfHH = document.getElementById('pf-household');
+    if (update.household_size) pfHH.value = String(update.household_size);
+  }
+  showSupportIfNeeded();
+  showInlineAlert('selections-alert', 'ok', 'Selections saved!');
+  showBanner();
+}
+
+// ── Save Password ──
+async function savePassword() {
+  const pw1 = document.getElementById('pf-pw1').value;
+  const pw2 = document.getElementById('pf-pw2').value;
+  if (!pw1) { showInlineAlert('pw-alert','err','Please enter a new password.'); return; }
+  if (pw1.length < 8) { showInlineAlert('pw-alert','err','Password must be at least 8 characters.'); return; }
+  if (pw1 !== pw2) { showInlineAlert('pw-alert','err','Passwords do not match.'); return; }
+  const { error } = await sb.auth.updateUser({ password: pw1 });
+  if (error) { showInlineAlert('pw-alert','err','Could not update password: ' + error.message); return; }
+  document.getElementById('pf-pw1').value = '';
+  document.getElementById('pf-pw2').value = '';
+  showInlineAlert('pw-alert','ok','Password updated successfully!');
+  showBanner();
+}
+
+// ── Food Assistance Popup ──
+function checkFAPopup() {
+  if (!memberData) return;
+  const types = memberData.user_types || [];
+  if (types.includes('food_assistance') && (!memberData.zip_code || !memberData.household_size)) {
+    document.getElementById('fa-popup-zip').value       = memberData.zip_code       || '';
+    document.getElementById('fa-popup-household').value = memberData.household_size ? String(memberData.household_size) : '';
+    document.getElementById('fa-popup-overlay').style.display = 'flex';
+  }
+}
+
+function dismissFAPopup() {
+  document.getElementById('fa-popup-overlay').style.display = 'none';
+}
+
+async function saveFAPopup() {
+  const zip  = document.getElementById('fa-popup-zip').value.trim();
+  const hh   = document.getElementById('fa-popup-household').value;
+  if (!zip && !hh) { dismissFAPopup(); return; }
+  await sb.from('members').update({
+    zip_code:       zip || null,
+    household_size: hh  || null,
+    updated_at:     new Date().toISOString()
+  }).eq('id', currentUser.id);
+  memberData.zip_code       = zip || null;
+  memberData.household_size = hh  || null;
+  if (zip) { document.getElementById('pf-zip').value = zip; document.getElementById('sel-zip').value = zip; }
+  if (hh)  {
+    document.getElementById('pf-household').value  = hh;
+    document.getElementById('sel-household').value = hh;
+  }
+  dismissFAPopup();
+  showBanner();
+}
+
+// ── Support Section ──
+function showSupportIfNeeded() {
+  const types = memberData?.user_types || [];
+  const supportTypes = ['volunteer','partner','coalition','donate','informed'];
+  const hasSupport = types.some(t => supportTypes.includes(t));
+  document.getElementById('support-section').style.display = hasSupport ? 'block' : 'none';
+}
+
+// ── Idealist iframe ──
+let iframeTimer = null;
+function iframeLoaded() {
+  if (iframeTimer) clearTimeout(iframeTimer);
+}
+function iframeFailed() {
+  document.getElementById('idealist-iframe').style.display = 'none';
+  document.getElementById('idealist-fallback').style.display = 'block';
+}
+// Fallback if iframe doesn't load within 8 seconds
+window.addEventListener('load', () => {
+  const iframe = document.getElementById('idealist-iframe');
+  if (!iframe) return;
+  iframeTimer = setTimeout(() => {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc || doc.body?.innerHTML === '') iframeFailed();
+    } catch(e) {
+      // Cross-origin: assume loaded (no error thrown by browser)
+    }
+  }, 8000);
+});
+
+// ── View Navigation ──
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById('view-' + name);
+  if (target) target.classList.add('active');
+  closeSidebar();
+}
+
+function toggleNavGroup(group) {
+  const sub = document.getElementById('sub-' + group);
+  const arr = document.getElementById('arr-' + group);
+  const btn = document.getElementById('nav-' + group);
+  const isOpen = sub.classList.contains('open');
+  sub.classList.toggle('open', !isOpen);
+  btn.classList.toggle('expanded', !isOpen);
+}
+
+// ── Sidebar Toggle ──
+function toggleSidebar() {
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebar-overlay');
+  s.classList.toggle('open');
+  o.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ── UI helpers ──
 function showBanner() {
   const b = document.getElementById('save-banner');
   b.classList.add('show');
   setTimeout(() => b.classList.remove('show'), 2500);
+}
+
+function showInlineAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'inline-alert ' + type + ' show';
+  el.textContent = msg;
+  setTimeout(() => { el.className = 'inline-alert'; }, 4000);
 }
 
 async function signOut() {
