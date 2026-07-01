@@ -167,6 +167,23 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .save-banner{position:fixed;bottom:24px;right:24px;background:var(--green);color:white;padding:12px 20px;border-radius:100px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
 .save-banner.show{transform:translateY(0);opacity:1;}
 
+/* ── SESSION TIMEOUT TOAST (NIST SP 800-63B) ── */
+.session-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--p2);color:white;padding:14px 20px;border-radius:14px;font-size:13px;font-weight:500;box-shadow:0 6px 28px rgba(0,0,0,.35);z-index:1500;transition:transform .35s cubic-bezier(.22,1,.36,1);white-space:nowrap;display:flex;align-items:center;gap:14px;min-width:280px;}
+.session-toast.show{transform:translateX(-50%) translateY(0);}
+.session-toast-msg{flex:1;line-height:1.4;}
+.session-toast-msg small{display:block;font-size:11px;color:rgba(196,168,245,.7);margin-top:2px;}
+.session-toast-btn{background:var(--gold);border:none;color:var(--p1);padding:7px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0;}
+
+/* ── FORCED LOGOUT OVERLAY ── */
+.logout-overlay{position:fixed;inset:0;background:rgba(22,8,43,.92);backdrop-filter:blur(6px);z-index:3000;display:none;align-items:center;justify-content:center;padding:24px;}
+.logout-overlay.show{display:flex;}
+.logout-box{background:white;border-radius:20px;padding:36px;max-width:400px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.4);}
+.logout-box-icon{font-size:44px;margin-bottom:16px;display:block;}
+.logout-box-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--p2);margin-bottom:8px;}
+.logout-box-msg{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:22px;}
+.logout-box-reason{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p4);background:#f0ecff;padding:4px 10px;border-radius:100px;margin-bottom:16px;}
+.btn-relogin{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:13px 28px;border-radius:100px;font-size:14px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--sans);}
+
 /* ── PROFILE VIEW ── */
 .view-header{margin-bottom:24px;}
 .view-title{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--p2);margin-bottom:4px;}
@@ -575,6 +592,26 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 
 <div class="save-banner" id="save-banner">✅ Saved!</div>
 
+<!-- SESSION WARNING TOAST (shown at 25 min inactivity) -->
+<div class="session-toast" id="session-toast">
+  <div class="session-toast-msg">
+    Your session is about to expire
+    <small id="session-countdown">You'll be signed out in 5:00</small>
+  </div>
+  <button class="session-toast-btn" onclick="extendSession()">Stay Signed In</button>
+</div>
+
+<!-- FORCED LOGOUT OVERLAY -->
+<div class="logout-overlay" id="logout-overlay">
+  <div class="logout-box">
+    <span class="logout-box-icon">🔒</span>
+    <div class="logout-box-reason" id="logout-reason">Session Expired</div>
+    <h2 class="logout-box-title">You've been signed out</h2>
+    <p class="logout-box-msg" id="logout-msg">For your security, your session has ended. Please sign in again to continue.</p>
+    <a href="auth.html#signin" class="btn-relogin">Sign In Again →</a>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script>
@@ -585,12 +622,131 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let memberData  = null;
 
+// ════════════════════════════════════════════════════════
+// NIST SP 800-63B SESSION MANAGEMENT
+// AAL2 requirements:
+//   • Inactivity timeout  : 30 minutes  (warn at 25 min)
+//   • Absolute timeout    : 12 hours from login
+//   • Activity detection  : mouse, keyboard, touch, scroll
+// ════════════════════════════════════════════════════════
+const INACTIVITY_MS  = 30 * 60 * 1000;   // 30 min
+const WARN_MS        = 25 * 60 * 1000;   // warn at 25 min
+const COUNTDOWN_MS   = 5  * 60 * 1000;   // 5 min warning window
+const ABSOLUTE_MS    = 12 * 60 * 60 * 1000; // 12 hr hard limit
+const REFRESH_MS     = 20 * 60 * 1000;   // refresh token every 20 min
+
+let _inactivityTimer  = null;
+let _warnTimer        = null;
+let _absoluteTimer    = null;
+let _refreshTimer     = null;
+let _countdownTimer   = null;
+let _sessionStartTime = null;
+
+function startSessionTimers() {
+  _sessionStartTime = _sessionStartTime || Date.now();
+  resetInactivityTimers();
+
+  // Absolute 12-hour hard limit regardless of activity
+  if (!_absoluteTimer) {
+    const elapsed = Date.now() - _sessionStartTime;
+    const remaining = Math.max(0, ABSOLUTE_MS - elapsed);
+    _absoluteTimer = setTimeout(() => forceLogout('absolute'), remaining);
+  }
+
+  // Refresh Supabase token every 20 min to keep server-side session alive
+  if (!_refreshTimer) {
+    _refreshTimer = setInterval(async () => {
+      const { error } = await sb.auth.refreshSession();
+      if (error) forceLogout('inactivity');
+    }, REFRESH_MS);
+  }
+
+  // Reset inactivity clock on any user activity
+  ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(evt =>
+    document.addEventListener(evt, resetInactivityTimers, { passive: true })
+  );
+}
+
+function resetInactivityTimers() {
+  clearTimeout(_inactivityTimer);
+  clearTimeout(_warnTimer);
+  clearTimeout(_countdownTimer);
+  hideSessionToast();
+
+  _warnTimer = setTimeout(showSessionWarning, WARN_MS);
+  _inactivityTimer = setTimeout(() => forceLogout('inactivity'), INACTIVITY_MS);
+}
+
+function showSessionWarning() {
+  const toast = document.getElementById('session-toast');
+  const countdown = document.getElementById('session-countdown');
+  toast.classList.add('show');
+
+  let remaining = COUNTDOWN_MS;
+  countdown.textContent = `You'll be signed out in ${fmtTime(remaining)}`;
+  _countdownTimer = setInterval(() => {
+    remaining -= 1000;
+    if (remaining <= 0) {
+      clearInterval(_countdownTimer);
+      return;
+    }
+    countdown.textContent = `You'll be signed out in ${fmtTime(remaining)}`;
+  }, 1000);
+}
+
+function hideSessionToast() {
+  document.getElementById('session-toast').classList.remove('show');
+  clearInterval(_countdownTimer);
+}
+
+function extendSession() {
+  hideSessionToast();
+  resetInactivityTimers();
+  sb.auth.refreshSession();
+}
+
+async function forceLogout(reason) {
+  clearTimeout(_inactivityTimer);
+  clearTimeout(_warnTimer);
+  clearTimeout(_absoluteTimer);
+  clearInterval(_refreshTimer);
+  clearInterval(_countdownTimer);
+  hideSessionToast();
+
+  await sb.auth.signOut();
+
+  const overlay  = document.getElementById('logout-overlay');
+  const reasonEl = document.getElementById('logout-reason');
+  const msgEl    = document.getElementById('logout-msg');
+
+  if (reason === 'absolute') {
+    reasonEl.textContent = 'Session Limit Reached';
+    msgEl.textContent    = 'For your security, sessions are limited to 12 hours. Please sign in again to continue.';
+  } else {
+    reasonEl.textContent = 'Session Expired';
+    msgEl.textContent    = 'You were inactive for 30 minutes. Please sign in again to continue.';
+  }
+
+  overlay.classList.add('show');
+}
+
+function fmtTime(ms) {
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
 // ── Auth guard ──
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'auth.html'; return; }
   currentUser = session.user;
+  // Restore absolute session start time across page reloads
+  const stored = sessionStorage.getItem('jjc_sess_start');
+  _sessionStartTime = stored ? parseInt(stored) : Date.now();
+  sessionStorage.setItem('jjc_sess_start', _sessionStartTime);
   await loadDashboard();
+  startSessionTimers();
 }
 
 async function loadDashboard() {
@@ -924,6 +1080,7 @@ function showInlineAlert(id, type, msg) {
 }
 
 async function signOut() {
+  sessionStorage.removeItem('jjc_sess_start');
   await sb.auth.signOut();
   window.location.href = 'index.html';
 }
