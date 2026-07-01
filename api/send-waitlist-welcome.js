@@ -192,21 +192,32 @@ export default async function handler(req, res) {
     return;
   }
 
-  try {
-    // Fetch all waitlist entries not yet welcomed
-    const sbRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/waitlist?select=email,first_name,last_name,welcomed_at&welcomed_at=is.null&order=created_at.asc`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json',
-        }
-      }
-    );
+  // Parse body — support both JSON and empty body
+  let body = {};
+  try { body = req.body || {}; } catch (_) {}
+  const testEmail = body.test_email || null;
 
-    if (!sbRes.ok) throw new Error(`Supabase error: ${sbRes.status}`);
-    const waitlist = await sbRes.json();
+  try {
+    let waitlist;
+
+    if (testEmail) {
+      // TEST MODE — send only to the specified address, do not mark welcomed_at
+      waitlist = [{ email: testEmail, first_name: 'Victoria', last_name: '' }];
+    } else {
+      // LIVE MODE — fetch all waitlist entries not yet welcomed
+      const sbRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/waitlist?select=email,first_name,last_name,welcomed_at&welcomed_at=is.null&order=created_at.asc`,
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      if (!sbRes.ok) throw new Error(`Supabase error: ${sbRes.status}`);
+      waitlist = await sbRes.json();
+    }
 
     if (!waitlist || waitlist.length === 0) {
       res.writeHead(200, corsHeaders());
