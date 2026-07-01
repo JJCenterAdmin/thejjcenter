@@ -23,6 +23,10 @@ ALTER TABLE members
 -- Optional: index on user_types for efficient filtering by type
 CREATE INDEX IF NOT EXISTS idx_members_user_types ON members USING GIN (user_types);
 
+-- Add welcomed_at to waitlist so we never send duplicate welcome emails
+ALTER TABLE waitlist
+  ADD COLUMN IF NOT EXISTS welcomed_at timestamptz DEFAULT NULL;
+
 -- Verify the columns exist
 SELECT column_name, data_type
 FROM information_schema.columns
