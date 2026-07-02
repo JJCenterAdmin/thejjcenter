@@ -2,11 +2,19 @@ name: Weekly Member Report
 
 on:
   schedule:
-    # Fridays at 8am, 12pm, and 4pm EST (13:00, 17:00, 21:00 UTC)
-    # Script checks if report was already sent today — only sends once
-    - cron: '0 13 * * 5'
-    - cron: '0 17 * * 5'
-    - cron: '0 21 * * 5'
+    # Every 2 hours on Fridays (UTC) — script sends only once per day via report_log dedup
+    - cron: '0 0 * * 5'
+    - cron: '0 2 * * 5'
+    - cron: '0 4 * * 5'
+    - cron: '0 6 * * 5'
+    - cron: '0 8 * * 5'
+    - cron: '0 10 * * 5'
+    - cron: '0 12 * * 5'
+    - cron: '0 14 * * 5'
+    - cron: '0 16 * * 5'
+    - cron: '0 18 * * 5'
+    - cron: '0 20 * * 5'
+    - cron: '0 22 * * 5'
   workflow_dispatch: {}  # allows manual trigger from GitHub Actions tab
 
 jobs:
