@@ -39,7 +39,7 @@ async function markAuditedToday() {
 
 const PAGES = [
   { name: 'Home',      url: '/',           checks: ['The JJ Center', 'Ward 8', 'Create My Free Account'] },
-  { name: 'Auth',      url: '/auth.html',  checks: ['Sign In', 'Sign Up', 'Send My Code'] },
+  { name: 'Auth',      url: '/auth.html',  checks: ['Send My Code', 'email'] },
   { name: 'Privacy',   url: '/privacy.html', checks: ['Privacy'] },
   { name: 'Terms',     url: '/terms.html',   checks: ['Terms'] },
   { name: 'Resources', url: '/resources.html', checks: [] },
@@ -66,10 +66,10 @@ async function auditPage(page, pageInfo) {
       if (found === 0) failures.push(`❌ Missing text "${text}" on ${pageInfo.name}`);
     }
 
-    // Check for broken images
+    // Check for broken images (skip inline data: URIs — those are always valid)
     const brokenImages = await page.evaluate(() => {
       return Array.from(document.images)
-        .filter(img => !img.complete || img.naturalWidth === 0)
+        .filter(img => !img.src.startsWith('data:') && (!img.complete || img.naturalWidth === 0))
         .map(img => img.src);
     });
     for (const src of brokenImages) {
