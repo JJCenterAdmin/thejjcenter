@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS report_log (
   created_at timestamptz default now()
 );
 
+-- audit_log table — tracks which dates the daily site audit ran
+-- prevents duplicate audit runs when GitHub fires the cron multiple times per day
+CREATE TABLE IF NOT EXISTS audit_log (
+  id          bigint generated always as identity primary key,
+  audit_date  date not null unique,
+  created_at  timestamptz default now()
+);
+
 -- Verify the columns exist
 SELECT column_name, data_type
 FROM information_schema.columns

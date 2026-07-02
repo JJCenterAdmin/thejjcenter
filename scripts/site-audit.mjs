@@ -5,8 +5,37 @@
 import { chromium } from 'playwright';
 import { sendEmail } from './send-email-gmail.mjs';
 
-const SITE      = 'https://jjcenter.org';
-const REPORT_TO = 'hello@jjcenter.org';
+const SITE         = 'https://jjcenter.org';
+const REPORT_TO    = 'hello@jjcenter.org';
+const SUPABASE_URL = 'https://mkldikwqxninqcmorwsg.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+async function alreadyAuditedToday() {
+  if (!SUPABASE_KEY) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/audit_log?select=audit_date&audit_date=eq.${today}&limit=1`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) return false;
+  const rows = await res.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function markAuditedToday() {
+  if (!SUPABASE_KEY) return;
+  const today = new Date().toISOString().slice(0, 10);
+  await fetch(`${SUPABASE_URL}/rest/v1/audit_log`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal',
+    },
+    body: JSON.stringify({ audit_date: today }),
+  });
+}
 
 const PAGES = [
   { name: 'Home',      url: '/',           checks: ['The JJ Center', 'Ward 8', 'Create My Free Account'] },
@@ -111,6 +140,11 @@ function buildEmailHtml(failures, checkedAt) {
 }
 
 async function run() {
+  if (await alreadyAuditedToday()) {
+    console.log('Audit already ran today — skipping.');
+    process.exit(0);
+  }
+
   const checkedAt = new Date().toLocaleString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York', timeZoneName: 'short',
@@ -136,6 +170,8 @@ async function run() {
     const failures = await auditApi(endpoint);
     allFailures.push(...failures);
   }
+
+  await markAuditedToday();
 
   if (allFailures.length === 0) {
     console.log(`✓ All checks passed — ${checkedAt}`);
