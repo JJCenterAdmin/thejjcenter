@@ -369,40 +369,17 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
         </div>
       </div>
 
-      <!-- SUPPORT SECTION (shown for non-food-only users) -->
-      <div id="support-section" style="display:none;">
-        <div class="sec-head"><div class="sec-title">How to Support The JJ Center</div></div>
-        <div class="support-cards">
-          <div class="support-card">
-            <div class="support-card-icon">💰</div>
-            <div class="support-card-title">Donate</div>
-            <div class="support-card-sub">Support our community — every dollar helps us provide food, health resources, and connections for Ward 8 neighbors.</div>
-            <a href="https://givebutter.com/thejjcenter" target="_blank" rel="noopener" class="btn-support">Support our community →</a>
-          </div>
-          <div class="support-card">
-            <div class="support-card-icon">🤝</div>
-            <div class="support-card-title">Volunteer</div>
-            <div class="support-card-sub">Join our team and help us make a real difference in Ward 8. Browse open volunteer positions on Idealist.</div>
-            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" rel="noopener" class="btn-support">Join our team →</a>
-          </div>
-        </div>
-
-        <!-- Current Openings -->
-        <div class="idealist-wrap">
-          <div class="sec-head">
-            <div class="sec-title">Current Openings</div>
-            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington?tab=VOLOP#opportunities" target="_blank" rel="noopener" class="sec-link">View all on Idealist →</a>
-          </div>
-          <div id="idealist-listings">
-            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
-            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
-            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
-          </div>
+      <!-- ANNOUNCEMENTS — always shown, full width, directly below hero -->
+      <div class="card" id="announce-section">
+        <div class="card-title">Announcements from Dr. Roach</div>
+        <div class="announce-list" id="announce-list">
+          <div class="skeleton" style="height:76px;"></div>
+          <div class="skeleton" style="height:76px;"></div>
         </div>
       </div>
 
-      <!-- PANTRY OPT-IN -->
-      <div class="pantry-card" id="pantry-optin-card">
+      <!-- PANTRY OPT-IN — food_assistance or coalition -->
+      <div class="pantry-card" id="pantry-optin-card" style="display:none;">
         <div class="pantry-icon">🥦</div>
         <div class="pantry-info">
           <h3 class="pantry-title">Food Pantry Notifications</h3>
@@ -419,8 +396,8 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
         </div>
       </div>
 
-      <!-- MAIN GRID: VISITS + ANNOUNCEMENTS -->
-      <div class="grid-2">
+      <!-- VISIT HISTORY — food_assistance or coalition -->
+      <div id="visit-history-section" style="display:none;">
         <div class="card">
           <div class="sec-head">
             <div class="card-title">Visit History</div>
@@ -432,14 +409,42 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
             <div class="skeleton" style="height:44px;"></div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">Announcements from Dr. Roach</div>
-          <div class="announce-list" id="announce-list">
-            <div class="skeleton" style="height:76px;"></div>
-            <div class="skeleton" style="height:76px;"></div>
+      </div>
+
+      <!-- HOW TO SUPPORT — donate, volunteer, or coalition -->
+      <div id="support-section" style="display:none;">
+        <div class="sec-head"><div class="sec-title">How to Support The JJ Center</div></div>
+        <div class="support-cards">
+          <div class="support-card">
+            <div class="support-card-icon">💰</div>
+            <div class="support-card-title">Donate</div>
+            <div class="support-card-sub">Support our community — every dollar helps us provide food, health resources, and connections for Ward 8 neighbors.</div>
+            <a href="https://givebutter.com/thejjcenter" target="_blank" rel="noopener" class="btn-support">Support our community →</a>
+          </div>
+          <div class="support-card">
+            <div class="support-card-icon">🤝</div>
+            <div class="support-card-title">Volunteer</div>
+            <div class="support-card-sub">Join our team and help us make a real difference in Ward 8. Browse open volunteer positions on Idealist.</div>
+            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" rel="noopener" class="btn-support">Join our team →</a>
           </div>
         </div>
       </div>
+
+      <!-- CURRENT OPENINGS — volunteer, partner, or coalition -->
+      <div id="openings-section" style="display:none;">
+        <div class="idealist-wrap">
+          <div class="sec-head">
+            <div class="sec-title">Current Openings</div>
+            <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington?tab=VOLOP#opportunities" target="_blank" rel="noopener" class="sec-link">View all on Idealist →</a>
+          </div>
+          <div id="idealist-listings">
+            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
+            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
+            <div class="skeleton" style="height:38px;margin-bottom:8px;"></div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- end view-home -->
 
     <!-- ══ VIEW: PROFILE ══ -->
@@ -770,8 +775,7 @@ async function loadDashboard() {
 
   // Check food assistance popup
   checkFAPopup();
-  // Show support section for relevant user types
-  showSupportIfNeeded();
+  applyDashboardVisibility();
 
   document.getElementById('dash-loading').style.display = 'none';
   showView('home');
@@ -930,7 +934,7 @@ async function saveSelections() {
     const pfHH = document.getElementById('pf-household');
     if (update.household_size) pfHH.value = String(update.household_size);
   }
-  showSupportIfNeeded();
+  applyDashboardVisibility();
   showInlineAlert('selections-alert', 'ok', 'Selections saved!');
   showBanner();
 }
@@ -985,13 +989,26 @@ async function saveFAPopup() {
   showBanner();
 }
 
-// ── Support Section ──
-function showSupportIfNeeded() {
+// ── Dashboard Visibility ──
+function applyDashboardVisibility() {
   const types = memberData?.user_types || [];
-  const supportTypes = ['volunteer','partner','coalition','donate','informed'];
-  const hasSupport = types.some(t => supportTypes.includes(t));
-  document.getElementById('support-section').style.display = hasSupport ? 'block' : 'none';
-  if (hasSupport) loadIdealistListings();
+  const has = t => types.includes(t);
+
+  const showPantry   = has('food_assistance') || has('coalition');
+  const showVisits   = has('food_assistance') || has('coalition');
+  const showSupport  = has('donate') || has('volunteer') || has('coalition');
+  const showOpenings = has('volunteer') || has('partner') || has('coalition');
+
+  const show = (id, visible) => {
+    document.getElementById(id).style.display = visible ? '' : 'none';
+  };
+
+  show('pantry-optin-card',    showPantry);
+  show('visit-history-section', showVisits);
+  show('support-section',      showSupport);
+  show('openings-section',     showOpenings);
+
+  if (showOpenings) loadIdealistListings();
 }
 
 // ── Idealist Live Listings ──
