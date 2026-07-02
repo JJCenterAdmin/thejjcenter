@@ -1,0 +1,29 @@
+name: Daily Site Audit
+
+on:
+  schedule:
+    # Every day at 9am EST (14:00 UTC)
+    - cron: '0 14 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install nodemailer playwright
+
+      - name: Install Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Run site audit
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: node scripts/site-audit.mjs
