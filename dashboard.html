@@ -993,6 +993,7 @@ async function saveFAPopup() {
 // ── Dashboard Visibility ──
 function applyDashboardVisibility() {
   const types = memberData?.user_types || [];
+  console.log('[JJC] applyDashboardVisibility user_types:', types);
   const has = t => types.includes(t);
 
   const showPantry   = has('food_assistance') || has('coalition');
@@ -1001,7 +1002,8 @@ function applyDashboardVisibility() {
   const showOpenings = has('volunteer') || has('partner') || has('coalition');
 
   const show = (id, visible) => {
-    document.getElementById(id).style.display = visible ? '' : 'none';
+    const el = document.getElementById(id);
+    if (el) el.style.display = visible ? 'block' : 'none';
   };
 
   show('pantry-optin-card',    showPantry);
