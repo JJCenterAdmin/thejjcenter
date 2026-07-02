@@ -924,11 +924,6 @@ async function saveSelections() {
   const btn = document.getElementById('btn-save-selections');
   btn.disabled = true; btn.textContent = 'Saving...';
   const types = Array.from(document.querySelectorAll('input[name="sel_type"]:checked')).map(c => c.value);
-  if (types.length === 0) {
-    btn.disabled = false; btn.textContent = 'Save Selections';
-    showInlineAlert('selections-alert', 'err', 'Please select at least one connection type.');
-    return;
-  }
   const update = {
     user_types: types,
     updated_at: new Date().toISOString()
