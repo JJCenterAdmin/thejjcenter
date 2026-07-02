@@ -786,8 +786,12 @@ async function loadDashboard() {
 
   await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData()]);
 
-  checkNoSelectionsPopup();
-  checkFAPopup();
+  const hasSelections = (memberData?.user_types || []).length > 0;
+  if (!hasSelections) {
+    checkNoSelectionsPopup();
+  } else {
+    checkFAPopup();
+  }
   applyDashboardVisibility();
 
   document.getElementById('dash-loading').style.display = 'none';
