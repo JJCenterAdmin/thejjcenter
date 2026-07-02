@@ -392,19 +392,21 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
       </div>
 
       <!-- PANTRY OPT-IN — food_assistance or coalition -->
-      <div class="pantry-card" id="pantry-optin-card" style="display:none;">
-        <div class="pantry-icon">🥦</div>
-        <div class="pantry-info">
-          <h3 class="pantry-title">Food Pantry Notifications</h3>
-          <p class="pantry-sub">Get notified about pantry days, schedule changes, and special distributions.</p>
-          <div class="pantry-optin">
-            <label class="toggle-switch"><input type="checkbox" id="pantry-toggle" onchange="savePantryPref()"><span class="toggle-slider"></span></label>
-            <span class="toggle-label">Notify me about pantry events</span>
-            <select class="pantry-freq" id="pantry-freq" onchange="savePantryPref()">
-              <option value="all">Every event</option>
-              <option value="weekly">Weekly digest</option>
-              <option value="urgent">Urgent only</option>
-            </select>
+      <div id="pantry-optin-card" style="display:none;">
+        <div class="pantry-card">
+          <div class="pantry-icon">🥦</div>
+          <div class="pantry-info">
+            <h3 class="pantry-title">Food Pantry Notifications</h3>
+            <p class="pantry-sub">Get notified about pantry days, schedule changes, and special distributions.</p>
+            <div class="pantry-optin">
+              <label class="toggle-switch"><input type="checkbox" id="pantry-toggle" onchange="savePantryPref()"><span class="toggle-slider"></span></label>
+              <span class="toggle-label">Notify me about pantry events</span>
+              <select class="pantry-freq" id="pantry-freq" onchange="savePantryPref()">
+                <option value="all">Every event</option>
+                <option value="weekly">Weekly digest</option>
+                <option value="urgent">Urgent only</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
