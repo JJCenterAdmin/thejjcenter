@@ -1059,6 +1059,7 @@ function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const target = document.getElementById('view-' + name);
   if (target) target.classList.add('active');
+  if (name === 'home' && memberData) applyDashboardVisibility();
   closeSidebar();
 }
 
