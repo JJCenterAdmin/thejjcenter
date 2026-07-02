@@ -243,6 +243,19 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 </head>
 <body>
 
+<!-- NO SELECTIONS REMINDER POPUP -->
+<div class="fa-popup-overlay" id="no-selections-popup">
+  <div class="fa-popup">
+    <span class="fa-popup-icon">♛</span>
+    <h2 class="fa-popup-title">Tell us how you'd like to connect</h2>
+    <p class="fa-popup-sub">It looks like you haven't selected your interests yet. Let us know how you'd like to connect with The JJ Center so we can show you the right resources — food assistance, volunteering, staying informed, and more.</p>
+    <div class="fa-popup-actions">
+      <button class="btn-fa-save" onclick="dismissNoSelectionsPopup();showView('selections')">Choose My Interests →</button>
+      <button class="btn-fa-skip" onclick="dismissNoSelectionsPopup()">Maybe later</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOD ASSISTANCE MISSING INFO POPUP -->
 <div class="fa-popup-overlay" id="fa-popup-overlay">
   <div class="fa-popup">
@@ -773,7 +786,7 @@ async function loadDashboard() {
 
   await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData()]);
 
-  // Check food assistance popup
+  checkNoSelectionsPopup();
   checkFAPopup();
   applyDashboardVisibility();
 
@@ -953,6 +966,19 @@ async function savePassword() {
   document.getElementById('pf-pw2').value = '';
   showInlineAlert('pw-alert','ok','Password updated successfully!');
   showBanner();
+}
+
+// ── No Selections Reminder Popup ──
+function checkNoSelectionsPopup() {
+  if (!memberData) return;
+  const types = memberData.user_types || [];
+  if (types.length === 0) {
+    document.getElementById('no-selections-popup').style.display = 'flex';
+  }
+}
+
+function dismissNoSelectionsPopup() {
+  document.getElementById('no-selections-popup').style.display = 'none';
 }
 
 // ── Food Assistance Popup ──
