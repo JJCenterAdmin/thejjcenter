@@ -127,8 +127,12 @@ async function run() {
     `${SUPABASE_URL}/rest/v1/members?select=first_name,last_name,email,phone,zip_code,household_size,user_types,created_at&order=created_at.desc`,
     { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' } }
   );
-  if (!sbRes.ok) throw new Error(`Supabase error: ${sbRes.status}`);
+  if (!sbRes.ok) {
+    const errText = await sbRes.text();
+    throw new Error(`Supabase error: ${sbRes.status} — ${errText}`);
+  }
   const members = await sbRes.json();
+  console.log(`Supabase returned ${members.length} members:`, JSON.stringify(members.map(m => m.email)));
 
   const generatedAt = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
