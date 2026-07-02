@@ -27,6 +27,14 @@ CREATE INDEX IF NOT EXISTS idx_members_user_types ON members USING GIN (user_typ
 ALTER TABLE waitlist
   ADD COLUMN IF NOT EXISTS welcomed_at timestamptz DEFAULT NULL;
 
+-- report_log table — tracks which dates the weekly report was sent
+-- prevents duplicate sends when GitHub runs the cron multiple times on Friday
+CREATE TABLE IF NOT EXISTS report_log (
+  id         bigint generated always as identity primary key,
+  sent_date  date not null unique,
+  created_at timestamptz default now()
+);
+
 -- Verify the columns exist
 SELECT column_name, data_type
 FROM information_schema.columns

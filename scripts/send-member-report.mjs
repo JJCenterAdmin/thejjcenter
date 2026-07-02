@@ -117,10 +117,44 @@ function buildHtml(members, generatedAt) {
 </body></html>`;
 }
 
+async function alreadySentToday() {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD in UTC
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/report_log?select=sent_date&sent_date=eq.${today}&limit=1`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) return false; // if table doesn't exist yet, proceed
+  const rows = await res.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function markSentToday() {
+  const today = new Date().toISOString().slice(0, 10);
+  await fetch(
+    `${SUPABASE_URL}/rest/v1/report_log`,
+    {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ sent_date: today }),
+    }
+  );
+}
+
 async function run() {
   if (!RESEND_KEY || !SUPABASE_KEY) {
     console.error('Missing RESEND_API_KEY or SUPABASE_SERVICE_KEY');
     process.exit(1);
+  }
+
+  // Skip if report already sent today (handles multiple Friday cron attempts)
+  if (await alreadySentToday()) {
+    console.log('Report already sent today — skipping.');
+    process.exit(0);
   }
 
   const sbRes = await fetch(
@@ -162,6 +196,7 @@ async function run() {
     throw new Error(`Resend error: ${err}`);
   }
 
+  await markSentToday();
   console.log(`✓ Report sent — ${members.length} members — ${generatedAt}`);
 }
 
