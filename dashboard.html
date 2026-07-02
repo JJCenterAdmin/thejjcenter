@@ -802,9 +802,10 @@ async function loadVisits() {
 
 // ── Announcements ──
 async function loadAnnouncements() {
-  const { data: posts } = await sb.from('announcements')
-    .select('*').eq('published', true)
-    .order('published_at', { ascending: false }).limit(5);
+  const isPreview = currentUser?.email === 'roachvictoriaa@gmail.com';
+  let query = sb.from('announcements').select('*').eq('published', true);
+  if (!isPreview) query = query.eq('is_test', false);
+  const { data: posts } = await query.order('published_at', { ascending: false }).limit(5);
   const list = document.getElementById('announce-list');
   if (!posts || posts.length === 0) {
     list.innerHTML = `<div class="announce-empty">No announcements yet. Check back soon!</div>`;
