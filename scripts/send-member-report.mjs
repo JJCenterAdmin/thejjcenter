@@ -1,13 +1,11 @@
-// Standalone script — run by GitHub Actions every Friday 8am EST
-// Uses RESEND_API_KEY and SUPABASE_SERVICE_KEY from GitHub secrets
+// Standalone script — run by GitHub Actions every Friday
+// Uses GMAIL_USER, GMAIL_APP_PASSWORD, and SUPABASE_SERVICE_KEY from GitHub secrets
+
+import { sendEmail } from './send-email-gmail.mjs';
 
 const SITE_URL     = 'https://jjcenter.org';
-const FROM_EMAIL   = 'hello@jjcenter.org';
-const FROM_NAME    = 'The JJ Center';
 const REPORT_TO    = 'hello@jjcenter.org';
 const SUPABASE_URL = 'https://mkldikwqxninqcmorwsg.supabase.co';
-
-const RESEND_KEY   = process.env.RESEND_API_KEY;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 const USER_TYPE_LABELS = {
@@ -146,8 +144,8 @@ async function markSentToday() {
 }
 
 async function run() {
-  if (!RESEND_KEY || !SUPABASE_KEY) {
-    console.error('Missing RESEND_API_KEY or SUPABASE_SERVICE_KEY');
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD || !SUPABASE_KEY) {
+    console.error('Missing GMAIL_USER, GMAIL_APP_PASSWORD, or SUPABASE_SERVICE_KEY');
     process.exit(1);
   }
 
@@ -175,26 +173,18 @@ async function run() {
 
   const csvContent = buildCsv(members);
   const htmlContent = buildHtml(members, generatedAt);
-  const csvBase64 = Buffer.from(csvContent, 'utf-8').toString('base64');
   const dateStamp = new Date().toISOString().slice(0, 10);
 
-  const emailRes = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
-      to: [REPORT_TO],
-      subject: `📋 JJ Center Member Report — ${generatedAt}`,
-      html: htmlContent,
-      text: `JJ Center Member Report\nGenerated: ${generatedAt}\nTotal Members: ${members.length}\n\nSee attached CSV for full member list.`,
-      attachments: [{ filename: `jjcenter-members-${dateStamp}.csv`, content: csvBase64 }],
-    }),
+  await sendEmail({
+    to: REPORT_TO,
+    subject: `📋 JJ Center Member Report — ${generatedAt}`,
+    html: htmlContent,
+    text: `JJ Center Member Report\nGenerated: ${generatedAt}\nTotal Members: ${members.length}\n\nSee attached CSV for full member list.`,
+    attachments: [{
+      filename: `jjcenter-members-${dateStamp}.csv`,
+      content: Buffer.from(csvContent, 'utf-8'),
+    }],
   });
-
-  if (!emailRes.ok) {
-    const err = await emailRes.text();
-    throw new Error(`Resend error: ${err}`);
-  }
 
   await markSentToday();
   console.log(`✓ Report sent — ${members.length} members — ${generatedAt}`);
