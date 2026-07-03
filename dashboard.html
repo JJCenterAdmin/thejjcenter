@@ -929,6 +929,15 @@ async function saveSelections() {
     showInlineAlert('selections-alert', 'err', 'Please select at least one connection type.');
     return;
   }
+  if (types.includes('food_assistance')) {
+    const zip = document.getElementById('sel-zip').value.trim();
+    const hh  = document.getElementById('sel-household').value;
+    if (!zip || !hh) {
+      btn.disabled = false; btn.textContent = 'Save Selections';
+      showInlineAlert('selections-alert', 'err', 'Please enter your ZIP code and household size for food assistance.');
+      return;
+    }
+  }
   const update = {
     user_types: types,
     updated_at: new Date().toISOString()
