@@ -378,6 +378,10 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
               <div class="hero-stat-n" id="stat-days">0</div>
               <div class="hero-stat-l">Days as Member</div>
             </div>
+            <div class="hero-stat" id="stat-admin-accounts-wrap" style="display:none;">
+              <div class="hero-stat-n" id="stat-total-accounts">0</div>
+              <div class="hero-stat-l">Total Accounts</div>
+            </div>
           </div>
         </div>
         <div class="hero-qr">
@@ -791,7 +795,7 @@ async function loadDashboard() {
     { width: 130, margin: 1, color: { dark: '#2a1052', light: '#ffffff' } }
   );
 
-  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData()]);
+  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData(), loadAdminStats()]);
 
   const hasSelections = (memberData?.user_types || []).length > 0;
   if (!hasSelections) {
@@ -822,6 +826,15 @@ async function loadVisits() {
     const time = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     return `<div class="visit-row"><div class="visit-dot"></div><div class="visit-info"><div class="visit-date">${date}</div><div class="visit-type">${time} · ${v.visit_type || 'Pantry Visit'}</div></div></div>`;
   }).join('');
+}
+
+// ── Admin-only stats ──
+async function loadAdminStats() {
+  if (currentUser?.email !== 'roachvictoriaa@gmail.com') return;
+  const { data, error } = await sb.rpc('admin_member_count');
+  if (error || data == null) return;
+  document.getElementById('stat-total-accounts').textContent = data;
+  document.getElementById('stat-admin-accounts-wrap').style.display = '';
 }
 
 // ── Announcements ──

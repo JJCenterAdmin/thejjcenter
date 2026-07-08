@@ -43,6 +43,30 @@ CREATE TABLE IF NOT EXISTS audit_log (
   created_at  timestamptz default now()
 );
 
+-- admin_member_count — returns the total number of accounts in the
+-- members table. Row-level security normally limits each signed-in
+-- member to their own row, so this SECURITY DEFINER function is the
+-- only way to surface a site-wide total, and it checks the caller's
+-- email itself rather than trusting the client to gate access.
+CREATE OR REPLACE FUNCTION admin_member_count()
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  total integer;
+BEGIN
+  IF (auth.jwt() ->> 'email') IS DISTINCT FROM 'roachvictoriaa@gmail.com' THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+  SELECT count(*) INTO total FROM members;
+  RETURN total;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION admin_member_count() TO authenticated;
+
 -- Verify the columns exist
 SELECT column_name, data_type
 FROM information_schema.columns
