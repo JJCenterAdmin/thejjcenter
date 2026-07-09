@@ -193,12 +193,11 @@ if (midFromQR) {
 
 async function handleStaffQRScan(memberId) {
   try {
-    // Look up the member by ID
-    const { data: member, error } = await sb
-      .from('members')
-      .select('id, first_name, last_name, email, created_at')
-      .eq('id', memberId)
-      .single();
+    // Look up the member by ID via RPC — row-level security limits direct
+    // table reads to a member's own row, so staff (not signed in as them)
+    // need this security-definer function to find them by id from the QR code.
+    const { data: rows, error } = await sb.rpc('checkin_lookup_member', { p_member_id: memberId });
+    const member = rows && rows[0];
 
     if (error || !member) {
       // Not in our system

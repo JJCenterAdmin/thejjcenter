@@ -514,24 +514,48 @@ async function doSignup() {
   if (userTypes.includes('food_assistance') && !household) return alert('al-up','err','Please enter your household size.');
   ld('btn-up', true);
   try {
+    const zipVal = userTypes.includes('food_assistance') ? (zip || null) : null;
+    const householdVal = userTypes.includes('food_assistance') ? (household || null) : null;
     const { data, error } = await sb.auth.signUp({
       email: em, password: pw,
-      options: { data: { first_name: fn, last_name: ln }, emailRedirectTo: location.origin + '/dashboard.html' }
+      options: {
+        // Stored on the auth user regardless of email-confirmation status,
+        // so these selections survive even though the members table write
+        // below can't succeed until the user has a confirmed session.
+        data: { first_name: fn, last_name: ln, user_types: userTypes, zip_code: zipVal, household_size: householdVal },
+        emailRedirectTo: location.origin + '/dashboard.html'
+      }
     });
     if (error) throw error;
+
+    // Supabase returns success with an empty identities array (no error) when
+    // the email is already registered, to avoid leaking which emails exist.
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      throw new Error('An account with this email already exists. Please sign in instead.');
+    }
+
     if (data.user) {
-      await sb.from('members').upsert({
+      // Best-effort — if email confirmation is required there's no session yet,
+      // so RLS will block this write; loadDashboard() re-creates the row from
+      // the auth metadata above on first login in that case.
+      const { error: upsertErr } = await sb.from('members').upsert({
         id: data.user.id, email: em, first_name: fn, last_name: ln,
         source: 'web_signup', created_at: new Date().toISOString(),
-        user_types: userTypes,
-        zip_code: userTypes.includes('food_assistance') ? (zip || null) : null,
-        household_size: userTypes.includes('food_assistance') ? (household ? parseInt(household) : null) : null
+        user_types: userTypes, zip_code: zipVal,
+        household_size: householdVal ? parseInt(householdVal) : null
       });
+      if (upsertErr) console.error('members upsert at signup failed (will sync on first login):', upsertErr);
       await sb.from('waitlist').delete().eq('email', em);
     }
     document.getElementById('main').style.display = 'none';
     document.getElementById('suc').style.display = 'block';
-    document.getElementById('suc-msg').textContent = 'We sent a confirmation email to ' + em + '. Click the link to activate your account, then come back to sign in.';
+    if (data.session) {
+      // Email confirmation is disabled on this project — already signed in.
+      document.getElementById('suc-msg').textContent = 'Your account is ready! Taking you to your dashboard...';
+      setTimeout(() => location.href = 'dashboard.html', 1500);
+    } else {
+      document.getElementById('suc-msg').textContent = 'We sent a confirmation email to ' + em + '. Click the link to activate your account, then come back to sign in.';
+    }
   } catch (err) {
     rlRecord('up', document.getElementById('rl-up'));
     const msg = err.message?.toLowerCase().includes('already registered')

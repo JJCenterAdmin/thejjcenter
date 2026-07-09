@@ -779,8 +779,26 @@ async function init() {
 }
 
 async function loadDashboard() {
-  const { data: member } = await sb.from('members').select('*').eq('id', currentUser.id).single();
-  memberData = member || { first_name: currentUser.user_metadata?.first_name || 'Friend', last_name: '' };
+  let { data: member } = await sb.from('members').select('*').eq('id', currentUser.id).single();
+
+  if (!member) {
+    // No row yet — happens when email confirmation was required at signup,
+    // so the initial members write couldn't go through (no session then).
+    // Recreate it now from the auth metadata captured during signup, now
+    // that we're authenticated and RLS allows writing our own row.
+    const meta = currentUser.user_metadata || {};
+    const seed = {
+      id: currentUser.id, email: currentUser.email,
+      first_name: meta.first_name || 'Friend', last_name: meta.last_name || '',
+      user_types: meta.user_types || null, zip_code: meta.zip_code || null,
+      household_size: meta.household_size ? parseInt(meta.household_size) : null,
+      source: 'web_signup', created_at: currentUser.created_at
+    };
+    const { data: created } = await sb.from('members').upsert(seed).select().single();
+    member = created || seed;
+  }
+
+  memberData = member;
 
   const fname = memberData.first_name || 'Friend';
   document.getElementById('nav-name').textContent = fname;
