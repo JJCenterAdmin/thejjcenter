@@ -67,6 +67,24 @@ $$;
 
 GRANT EXECUTE ON FUNCTION admin_member_count() TO authenticated;
 
+-- checkin_lookup_member — lets the check-in page (staff scanning a member's
+-- QR code, no staff login) look up a member by id without needing row-level
+-- security to allow arbitrary reads of the members table. Only returns the
+-- handful of fields the check-in success screen displays — no email/phone/PII.
+CREATE OR REPLACE FUNCTION checkin_lookup_member(p_member_id uuid)
+RETURNS TABLE (id uuid, first_name text, last_name text, created_at timestamptz)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT id, first_name, last_name, created_at
+  FROM members
+  WHERE id = p_member_id;
+$$;
+
+GRANT EXECUTE ON FUNCTION checkin_lookup_member(uuid) TO anon;
+GRANT EXECUTE ON FUNCTION checkin_lookup_member(uuid) TO authenticated;
+
 -- Verify the columns exist
 SELECT column_name, data_type
 FROM information_schema.columns
