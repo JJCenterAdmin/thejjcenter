@@ -489,7 +489,7 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
 }
 
 /* Dr. Roach real photo */
-.roach-photo-wrap{position:relative;}
+.roach-photo-wrap{position:relative;max-height:72vh;overflow:hidden;border-radius:16px;}
 .roach-deco-ring{
   position:absolute;top:-14px;left:-14px;right:14px;bottom:-14px;
   border:2px solid rgba(196,168,245,.2);
@@ -499,10 +499,9 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
 .roach-photo-img{
   position:relative;z-index:1;
   width:100%;
-  height:auto;
-  max-height:75vh;
+  height:100%;
   object-fit:cover;
-  object-position:center 15%;
+  object-position:top center;
   border-radius:16px;
   display:block;
   box-shadow:0 28px 72px rgba(22,8,43,.6), 0 0 0 1px rgba(196,168,245,.1);
