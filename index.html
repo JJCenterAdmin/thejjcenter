@@ -108,7 +108,7 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
   position:absolute;inset:-6%;
   width:112%;height:112%;
   object-fit:cover;object-position:center;
-  filter:brightness(.70) saturate(.9);
+  filter:brightness(.42) saturate(.85);
   will-change:transform;
   display:block;
 }
@@ -120,9 +120,9 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
   position:absolute;inset:0;
   background:linear-gradient(
     160deg,
-    rgba(22,8,43,.55) 0%,
-    rgba(42,16,82,.20) 50%,
-    rgba(0,0,0,.10) 100%
+    rgba(22,8,43,.65) 0%,
+    rgba(42,16,82,.35) 50%,
+    rgba(200,146,42,.06) 100%
   );
 }
 .hero-content{
@@ -1709,7 +1709,7 @@ body.menu-open{overflow:hidden;}
 
 <!-- ═══ HERO ═══ -->
 <section id="hero">
-  <video class="hero-bg" id="hero-bg" autoplay muted loop playsinline
+  <video class="hero-bg" id="hero-bg" autoplay muted loop playsinline preload="auto"
     poster="hero-desktop-poster.jpg">
     <source src="hero-desktop.mp4" type="video/mp4">
   </video>
@@ -2320,10 +2320,17 @@ body.menu-open{overflow:hidden;}
 (function(){
   const v = document.getElementById('hero-bg');
   if(!v || v.tagName !== 'VIDEO') return;
-  // Respect prefers-reduced-motion
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    v.pause(); v.removeAttribute('autoplay');
+    v.pause(); v.removeAttribute('autoplay'); return;
   }
+  // Force play — some browsers need an explicit call even with autoplay attr
+  v.muted = true;
+  const tryPlay = () => v.play().catch(() => {});
+  if(v.readyState >= 2) { tryPlay(); }
+  else { v.addEventListener('canplay', tryPlay, {once:true}); }
+  // Retry on any stall
+  v.addEventListener('stalled', tryPlay);
+  v.addEventListener('suspend', tryPlay);
 })();
 
 // ═══ SCROLL ENGINE ═══
