@@ -111,6 +111,9 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
   will-change:transform;
   display:block;
 }
+@media(max-width:767px){
+  .hero-bg{inset:0;width:100%;height:100%;will-change:auto;}
+}
 /* Deep purple gradient wash over photo */
 .hero-wash{
   position:absolute;inset:0;
@@ -1699,7 +1702,6 @@ body.menu-open{overflow:hidden;}
 <section id="hero">
   <video class="hero-bg" id="hero-bg" autoplay muted loop playsinline
     poster="hero-desktop-poster.jpg">
-    <source src="hero-mobile.mp4"  type="video/mp4" media="(max-width:767px)">
     <source src="hero-desktop.mp4" type="video/mp4">
   </video>
   <div class="hero-wash"></div>
@@ -2305,8 +2307,6 @@ body.menu-open{overflow:hidden;}
 (function(){
   const v = document.getElementById('hero-bg');
   if(!v || v.tagName !== 'VIDEO') return;
-  // Swap poster for mobile
-  if(window.innerWidth <= 767) v.poster = 'hero-mobile-poster.jpg';
   // Respect prefers-reduced-motion
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     v.pause(); v.removeAttribute('autoplay');
