@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The JJ Center — My Dashboard</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -243,6 +248,19 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 </head>
 <body>
 
+<!-- NO SELECTIONS REMINDER POPUP -->
+<div class="fa-popup-overlay" id="no-selections-popup">
+  <div class="fa-popup">
+    <span class="fa-popup-icon">♛</span>
+    <h2 class="fa-popup-title">Tell us how you'd like to connect</h2>
+    <p class="fa-popup-sub">It looks like you haven't selected your interests yet. Let us know how you'd like to connect with The JJ Center so we can show you the right resources — food assistance, volunteering, staying informed, and more.</p>
+    <div class="fa-popup-actions">
+      <button class="btn-fa-save" onclick="dismissNoSelectionsPopup();showView('selections')">Choose My Interests →</button>
+      <button class="btn-fa-skip" onclick="dismissNoSelectionsPopup()">Maybe later</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOD ASSISTANCE MISSING INFO POPUP -->
 <div class="fa-popup-overlay" id="fa-popup-overlay">
   <div class="fa-popup">
@@ -359,6 +377,10 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
             <div class="hero-stat">
               <div class="hero-stat-n" id="stat-days">0</div>
               <div class="hero-stat-l">Days as Member</div>
+            </div>
+            <div class="hero-stat" id="stat-admin-accounts-wrap" style="display:none;">
+              <div class="hero-stat-n" id="stat-total-accounts">0</div>
+              <div class="hero-stat-l">Total Accounts</div>
             </div>
           </div>
         </div>
@@ -755,8 +777,26 @@ async function init() {
 }
 
 async function loadDashboard() {
-  const { data: member } = await sb.from('members').select('*').eq('id', currentUser.id).single();
-  memberData = member || { first_name: currentUser.user_metadata?.first_name || 'Friend', last_name: '' };
+  let { data: member } = await sb.from('members').select('*').eq('id', currentUser.id).single();
+
+  if (!member) {
+    // No row yet — happens when email confirmation was required at signup,
+    // so the initial members write couldn't go through (no session then).
+    // Recreate it now from the auth metadata captured during signup, now
+    // that we're authenticated and RLS allows writing our own row.
+    const meta = currentUser.user_metadata || {};
+    const seed = {
+      id: currentUser.id, email: currentUser.email,
+      first_name: meta.first_name || 'Friend', last_name: meta.last_name || '',
+      user_types: meta.user_types || null, zip_code: meta.zip_code || null,
+      household_size: meta.household_size ? parseInt(meta.household_size) : null,
+      source: 'web_signup', created_at: currentUser.created_at
+    };
+    const { data: created } = await sb.from('members').upsert(seed).select().single();
+    member = created || seed;
+  }
+
+  memberData = member;
 
   const fname = memberData.first_name || 'Friend';
   document.getElementById('nav-name').textContent = fname;
@@ -771,10 +811,14 @@ async function loadDashboard() {
     { width: 130, margin: 1, color: { dark: '#2a1052', light: '#ffffff' } }
   );
 
-  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData()]);
+  await Promise.all([loadVisits(), loadAnnouncements(), loadPantryPrefs(), loadProfileData(), loadAdminStats()]);
 
-  // Check food assistance popup
-  checkFAPopup();
+  const hasSelections = (memberData?.user_types || []).length > 0;
+  if (!hasSelections) {
+    checkNoSelectionsPopup();
+  } else {
+    checkFAPopup();
+  }
   applyDashboardVisibility();
 
   document.getElementById('dash-loading').style.display = 'none';
@@ -798,6 +842,15 @@ async function loadVisits() {
     const time = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     return `<div class="visit-row"><div class="visit-dot"></div><div class="visit-info"><div class="visit-date">${date}</div><div class="visit-type">${time} · ${v.visit_type || 'Pantry Visit'}</div></div></div>`;
   }).join('');
+}
+
+// ── Admin-only stats ──
+async function loadAdminStats() {
+  if (currentUser?.email !== 'roachvictoriaa@gmail.com') return;
+  const { data, error } = await sb.rpc('admin_member_count');
+  if (error || data == null) return;
+  document.getElementById('stat-total-accounts').textContent = data;
+  document.getElementById('stat-admin-accounts-wrap').style.display = '';
 }
 
 // ── Announcements ──
@@ -910,6 +963,15 @@ async function saveSelections() {
     showInlineAlert('selections-alert', 'err', 'Please select at least one connection type.');
     return;
   }
+  if (types.includes('food_assistance')) {
+    const zip = document.getElementById('sel-zip').value.trim();
+    const hh  = document.getElementById('sel-household').value;
+    if (!zip || !hh) {
+      btn.disabled = false; btn.textContent = 'Save Selections';
+      showInlineAlert('selections-alert', 'err', 'Please enter your ZIP code and household size for food assistance.');
+      return;
+    }
+  }
   const update = {
     user_types: types,
     updated_at: new Date().toISOString()
@@ -953,6 +1015,19 @@ async function savePassword() {
   document.getElementById('pf-pw2').value = '';
   showInlineAlert('pw-alert','ok','Password updated successfully!');
   showBanner();
+}
+
+// ── No Selections Reminder Popup ──
+function checkNoSelectionsPopup() {
+  if (!memberData) return;
+  const types = memberData.user_types || [];
+  if (types.length === 0) {
+    document.getElementById('no-selections-popup').style.display = 'flex';
+  }
+}
+
+function dismissNoSelectionsPopup() {
+  document.getElementById('no-selections-popup').style.display = 'none';
 }
 
 // ── Food Assistance Popup ──
@@ -1001,7 +1076,8 @@ function applyDashboardVisibility() {
   const showOpenings = has('volunteer') || has('partner') || has('coalition');
 
   const show = (id, visible) => {
-    document.getElementById(id).style.display = visible ? '' : 'none';
+    const el = document.getElementById(id);
+    if (el) el.style.display = visible ? 'block' : 'none';
   };
 
   show('pantry-optin-card',    showPantry);
@@ -1059,6 +1135,7 @@ function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const target = document.getElementById('view-' + name);
   if (target) target.classList.add('active');
+  if (name === 'home' && memberData) applyDashboardVisibility();
   closeSidebar();
 }
 

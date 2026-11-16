@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The JJ Center — Using Food as Your Medicine</title>
 <meta name="description" content="The JJ Center Food Pantry, Ward 8 Washington DC. Free food, no barriers, every week. Led by Dr. Mary A. Roach, PharmD.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -486,7 +491,7 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
 }
 
 /* Dr. Roach real photo */
-.roach-photo-wrap{position:relative;}
+.roach-photo-wrap{position:relative;max-height:55vh;overflow:hidden;border-radius:16px;}
 .roach-deco-ring{
   position:absolute;top:-14px;left:-14px;right:14px;bottom:-14px;
   border:2px solid rgba(196,168,245,.2);
@@ -496,6 +501,9 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
 .roach-photo-img{
   position:relative;z-index:1;
   width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:top center;
   border-radius:16px;
   display:block;
   box-shadow:0 28px 72px rgba(22,8,43,.6), 0 0 0 1px rgba(196,168,245,.1);
@@ -1626,7 +1634,7 @@ body.menu-open{overflow:hidden;}
     <a href="#crisis" class="nav-link">The Crisis</a>
     <a href="#solution" class="nav-link">Our Work</a>
     <a href="#dr-roach" class="nav-link">Dr. Roach</a>
-    <a href="#portal" class="nav-link">Join</a>
+    <a href="auth.html" class="nav-link">Join</a>
     <a href="#partner" class="nav-link">Partner</a>
     <a href="auth.html#signin" class="nav-btn" style="text-decoration:none;display:inline-flex;align-items:center;">Sign In</a>
     <a href="auth.html" class="nav-cta" style="text-decoration:none;">Sign Up</a>
@@ -1663,13 +1671,10 @@ body.menu-open{overflow:hidden;}
   <a href="#solution" onclick="closeMenu()"><span class="mobile-menu-icon">🥦</span>Our Work</a>
   <a href="#gallery" onclick="closeMenu()"><span class="mobile-menu-icon">📸</span>See Us in Action</a>
   <a href="#dr-roach" onclick="closeMenu()"><span class="mobile-menu-icon">👩🏾‍⚕️</span>Dr. Roach</a>
-  <a href="#portal" onclick="closeMenu()"><span class="mobile-menu-icon">♛</span>Join — Member Portal</a>
+  <a href="auth.html" onclick="closeMenu()"><span class="mobile-menu-icon">♛</span>Join — Member Portal</a>
   <a href="#partner" onclick="closeMenu()"><span class="mobile-menu-icon">🤝</span>Partner With Us</a>
-  <a href="auth.html#signin" onclick="closeMenu()" class="mobile-menu-donate" style="background:rgba(255,255,255,.1);color:white;">
-    <span class="mobile-menu-icon">🔑</span>Sign In
-  </a>
   <a href="auth.html" onclick="closeMenu()" class="mobile-menu-donate" style="background:linear-gradient(135deg,var(--p3),var(--p4));">
-    <span class="mobile-menu-icon">♛</span>Sign Up Free
+    <span class="mobile-menu-icon">♛</span>Sign Up / Sign In
   </a>
   <div class="mobile-dd-wrap">
     <button class="mobile-dd-btn" onclick="toggleDonateDd('mobile')">♥ &nbsp;Donate <span class="dd-caret" id="mobile-dd-caret">▼</span></button>
@@ -1856,6 +1861,7 @@ body.menu-open{overflow:hidden;}
     </div>
   </div>
 </div>
+</div>
 
 
 <!-- ── TRANSITION 2 ── -->
@@ -1893,7 +1899,7 @@ body.menu-open{overflow:hidden;}
         <div class="pillar"><div class="pi">🥦</div><div class="pt">Radical Accessibility</div><div class="pd">Outdoor, farmers market-style distributions — fresh, healthy food completely free for every family</div></div>
         <div class="pillar"><div class="pi">🩺</div><div class="pt">Clinical Oversight</div><div class="pd">Food curated by MDs, PharmDs &amp; Nutritionists to combat chronic disease</div></div>
         <div class="pillar"><div class="pi">🏫</div><div class="pt">Wellness Workshops</div><div class="pd">On-site medical nutrition &amp; chronic disease education on-site every week</div></div>
-        <div class="pillar"><div class="pi">🚚</div><div class="pt">DMV Grocery Network</div><div class="pd">Fresh food sourced from grocery partners across DC, Maryland &amp; Virginia</div>
+        <div class="pillar"><div class="pi">🚚</div><div class="pt">DMV Grocery Network</div><div class="pd">Fresh food sourced from grocery partners across DC, Maryland &amp; Virginia</div></div>
       </div>
     </div>
   </div>
@@ -1952,7 +1958,7 @@ body.menu-open{overflow:hidden;}
 </div>
 <!-- ═══ DR. ROACH (pinned scroll scene) ═══ -->
 <div class="pin-root" style="height:200vh;position:relative;z-index:5;" id="dr-roach">
-  <div class="sticky-scene">
+  <div class="sticky-scene" style="align-items:flex-start;padding-top:100px;">
     <div class="roach-bg"></div>
     <div class="roach-orb roach-orb1"></div>
     <div class="roach-orb roach-orb2"></div>
@@ -2012,7 +2018,7 @@ body.menu-open{overflow:hidden;}
         <div class="feat-org">Howard University · Washington, DC</div>
         <div class="feat-desc">Dr. Roach was named among Howard University's 2021 Charter Day Award recipients — honoring Distinguished Postgraduate Achievement for her impact in health, food access, and community service.</div>
         <div class="feat-link">View announcement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      </a>
+      </div>
 
       <!-- GWU / Global Woman PEACE Foundation Award -->
       <a class="feat-card" href="https://www.gwpfnd.org/awards" target="_blank" rel="noopener">
@@ -2075,7 +2081,7 @@ body.menu-open{overflow:hidden;}
       <div class="portal-card">
         <div class="tab-row">
           <a href="auth.html" class="tab on" style="text-decoration:none;display:block;">Create Account</a>
-          <a href="auth.html" class="tab" style="text-decoration:none;display:block;">Sign Up</a>
+          <a href="auth.html#signin" class="tab" style="text-decoration:none;display:block;">Sign In</a>
         </div>
         <div style="text-align:center;padding:20px 0;">
           <div style="font-size:40px;margin-bottom:16px;">♛</div>
@@ -2213,6 +2219,7 @@ body.menu-open{overflow:hidden;}
       <p class="donate-note">The JJ Center, Inc. is a registered 501(c)(3) nonprofit. All donations are tax-deductible.<br>
       Volunteer opportunities posted on <strong style="color:rgba(255,255,255,.55)">Idealist</strong> — clinical, distribution &amp; community roles available.</p>
   </div>
+</div>
 </div>
 
 <!-- ═══ FOOTER ═══ -->
