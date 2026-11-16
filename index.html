@@ -491,7 +491,7 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
 }
 
 /* Dr. Roach real photo */
-.roach-photo-wrap{position:relative;max-height:55vh;overflow:hidden;border-radius:16px;}
+.roach-photo-wrap{position:relative;border-radius:16px;}
 .roach-deco-ring{
   position:absolute;top:-14px;left:-14px;right:14px;bottom:-14px;
   border:2px solid rgba(196,168,245,.2);
@@ -501,9 +501,9 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x
 .roach-photo-img{
   position:relative;z-index:1;
   width:100%;
-  height:100%;
+  max-height:65vh;
   object-fit:cover;
-  object-position:top center;
+  object-position:center 20%;
   border-radius:16px;
   display:block;
   box-shadow:0 28px 72px rgba(22,8,43,.6), 0 0 0 1px rgba(196,168,245,.1);
@@ -1958,7 +1958,7 @@ body.menu-open{overflow:hidden;}
 </div>
 <!-- ═══ DR. ROACH (pinned scroll scene) ═══ -->
 <div class="pin-root" style="height:200vh;position:relative;z-index:5;" id="dr-roach">
-  <div class="sticky-scene" style="align-items:flex-start;padding-top:100px;">
+  <div class="sticky-scene" style="align-items:flex-start;padding-top:120px;">
     <div class="roach-bg"></div>
     <div class="roach-orb roach-orb1"></div>
     <div class="roach-orb roach-orb2"></div>
