@@ -1565,6 +1565,30 @@ body.menu-open{overflow:hidden;}
   #top-bar{font-size:10px;}
 }
 
+/* ═══ DONATE DROPDOWN ═══ */
+.donate-dd-wrap{position:relative;display:inline-block;}
+.donate-dd-btn{background:var(--gold);color:white;padding:9px 22px;border-radius:100px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:background .2s,transform .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.donate-dd-btn:hover{background:#a97520;transform:translateY(-1px);}
+.donate-dd-btn[aria-expanded="true"]{background:#a97520;}
+.donate-dd-btn .dd-caret{font-size:10px;transition:transform .2s;display:inline-block;}
+.donate-dd-btn[aria-expanded="true"] .dd-caret{transform:rotate(180deg);}
+.donate-dd{position:absolute;top:calc(100% + 8px);right:0;background:white;border-radius:16px;padding:8px;min-width:300px;box-shadow:0 12px 48px rgba(22,8,43,.22),0 0 0 1px rgba(22,8,43,.06);z-index:9999;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .18s,transform .18s,visibility .18s;}
+.donate-dd.open{opacity:1;visibility:visible;transform:translateY(0);}
+.donate-dd-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:12px;text-decoration:none;color:var(--p1);transition:background .15s;}
+.donate-dd-item:hover{background:#f5f0ff;}
+.donate-dd-emoji{font-size:22px;line-height:1;flex-shrink:0;margin-top:1px;}
+.donate-dd-label{font-size:14px;font-weight:700;color:var(--p2);margin-bottom:2px;}
+.donate-dd-desc{font-size:12px;color:#6b5f78;line-height:1.5;}
+.donate-dd-divider{height:1px;background:#f0ebf8;margin:4px 8px;}
+.mobile-dd-wrap{width:100%;position:relative;}
+.mobile-dd-btn{width:100%;background:var(--gold);color:white;padding:14px 20px;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px;border-radius:0;}
+.mobile-dd{background:rgba(255,255,255,.08);overflow:hidden;max-height:0;transition:max-height .3s ease;}
+.mobile-dd.open{max-height:400px;}
+.mobile-dd-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;text-decoration:none;color:white;border-top:1px solid rgba(255,255,255,.08);}
+.mobile-dd-item:hover{background:rgba(255,255,255,.06);}
+.mobile-dd-label{font-size:14px;font-weight:700;margin-bottom:2px;}
+.mobile-dd-desc{font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;}
+
 </style>
 </head>
 <body>
@@ -1604,7 +1628,25 @@ body.menu-open{overflow:hidden;}
     <a href="#partner" class="nav-link">Partner</a>
     <a href="auth.html#signin" class="nav-btn" style="text-decoration:none;display:inline-flex;align-items:center;">Sign In</a>
     <a href="auth.html" class="nav-cta" style="text-decoration:none;">Sign Up</a>
-    <a href="https://givebutter.com/thejjcenter" target="_blank" class="nav-cta">Donate ♥</a>
+    <div class="donate-dd-wrap" id="nav-dd-wrap">
+      <button class="nav-cta donate-dd-btn" id="nav-dd-btn" aria-expanded="false" aria-haspopup="true" onclick="toggleDonateDd('nav')">Donate ♥ <span class="dd-caret">▼</span></button>
+      <div class="donate-dd" id="nav-dd-menu" role="menu">
+        <a class="donate-dd-item" href="https://www.amazon.com/hz/wishlist/ls/194FUS94MTZVR" target="_blank" role="menuitem">
+          <span class="donate-dd-emoji">🍎</span>
+          <div><div class="donate-dd-label">Stock the Pantry</div><div class="donate-dd-desc">Buy items from our Amazon wishlist — delivered straight to us.</div></div>
+        </a>
+        <div class="donate-dd-divider"></div>
+        <a class="donate-dd-item" href="#" target="_blank" role="menuitem" id="toy-drive-item">
+          <span class="donate-dd-emoji">🎁</span>
+          <div><div class="donate-dd-label">Gift a Christmas Smile</div><div class="donate-dd-desc">Donate a toy or gift card for a Ward 8 child this holiday season.</div></div>
+        </a>
+        <div class="donate-dd-divider"></div>
+        <a class="donate-dd-item" href="https://givebutter.com/thejjcenter" target="_blank" role="menuitem">
+          <span class="donate-dd-emoji">💜</span>
+          <div><div class="donate-dd-label">Fuel the Mission</div><div class="donate-dd-desc">General donation — funds food, transport, and clinical programs.</div></div>
+        </a>
+      </div>
+    </div>
     <!-- Hamburger — mobile only -->
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -1627,9 +1669,20 @@ body.menu-open{overflow:hidden;}
   <a href="auth.html" onclick="closeMenu()" class="mobile-menu-donate" style="background:linear-gradient(135deg,var(--p3),var(--p4));">
     <span class="mobile-menu-icon">♛</span>Sign Up Free
   </a>
-  <a href="https://givebutter.com/thejjcenter" target="_blank" onclick="closeMenu()" class="mobile-menu-donate">
-    ♥ &nbsp;Donate Now
-  </a>
+  <div class="mobile-dd-wrap">
+    <button class="mobile-dd-btn" onclick="toggleDonateDd('mobile')">♥ &nbsp;Donate <span class="dd-caret" id="mobile-dd-caret">▼</span></button>
+    <div class="mobile-dd" id="mobile-dd-menu">
+      <a class="mobile-dd-item" href="https://www.amazon.com/hz/wishlist/ls/194FUS94MTZVR" target="_blank" onclick="closeMenu()">
+        <span>🍎</span><div><div class="mobile-dd-label">Stock the Pantry</div><div class="mobile-dd-desc">Amazon wishlist — delivered to us.</div></div>
+      </a>
+      <a class="mobile-dd-item" href="#" target="_blank" onclick="closeMenu()" id="toy-drive-mobile">
+        <span>🎁</span><div><div class="mobile-dd-label">Gift a Christmas Smile</div><div class="mobile-dd-desc">Toy or gift card for a Ward 8 child.</div></div>
+      </a>
+      <a class="mobile-dd-item" href="https://givebutter.com/thejjcenter" target="_blank" onclick="closeMenu()">
+        <span>💜</span><div><div class="mobile-dd-label">Fuel the Mission</div><div class="mobile-dd-desc">Fund food, transport, and programs.</div></div>
+      </a>
+    </div>
+  </div>
   <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" onclick="closeMenu()" class="mobile-menu-volunteer">
     🤝 &nbsp;Volunteer With Us
   </a>
@@ -1643,10 +1696,19 @@ body.menu-open{overflow:hidden;}
     <div class="hero-full-name">The Jehovah Jireh Community Development Center Inc.</div>
     <div class="hero-tag">Ward 8 · Washington DC · Est. 2005 · 501(c)(3)</div>
     <h1 class="hero-h1">Using Food<br>as <em>Your Medicine</em></h1>
-    <p class="hero-sub">Promoting unity in the Community through quality programs that bring about abundant life — a <em>free</em>, farmers market-style food distribution bringing fresh food to every family, every week, with no cost ever.</p>
+    <p class="hero-sub">Promoting unity in the Community through quality programs that bring about abundant life, a <em>free</em>, farmers market-style food distribution bringing fresh food to every family, every week, with no cost ever.</p>
     <div class="hero-actions">
       <a href="auth.html" class="btn-royal">Join Our Community →</a>
-      <a href="https://givebutter.com/thejjcenter" target="_blank" class="btn-gold">♥ Donate Now</a>
+      <div class="donate-dd-wrap" id="hero-dd-wrap">
+        <button class="btn-gold donate-dd-btn" id="hero-dd-btn" aria-expanded="false" onclick="toggleDonateDd('hero')">♥ Donate Now <span class="dd-caret">▼</span></button>
+        <div class="donate-dd" id="hero-dd-menu" role="menu">
+          <a class="donate-dd-item" href="https://www.amazon.com/hz/wishlist/ls/194FUS94MTZVR" target="_blank" role="menuitem"><span class="donate-dd-emoji">🍎</span><div><div class="donate-dd-label">Stock the Pantry</div><div class="donate-dd-desc">Amazon wishlist — delivered to us.</div></div></a>
+          <div class="donate-dd-divider"></div>
+          <a class="donate-dd-item" href="#" target="_blank" role="menuitem"><span class="donate-dd-emoji">🎁</span><div><div class="donate-dd-label">Gift a Christmas Smile</div><div class="donate-dd-desc">Toy or gift card for a Ward 8 child.</div></div></a>
+          <div class="donate-dd-divider"></div>
+          <a class="donate-dd-item" href="https://givebutter.com/thejjcenter" target="_blank" role="menuitem"><span class="donate-dd-emoji">💜</span><div><div class="donate-dd-label">Fuel the Mission</div><div class="donate-dd-desc">Fund food, transport, and programs.</div></div></a>
+        </div>
+      </div>
       <a href="#crisis" class="btn-ghost">Learn Our Mission</a>
     </div>
   </div>
@@ -2080,13 +2142,13 @@ body.menu-open{overflow:hidden;}
   <div class="partner-inner">
     <div class="partner-header reveal">
       <div class="eyebrow">Get Involved</div>
-      <h2 class="sh2">Three ways to partner<br>with The JJ Center</h2>
-      <p class="sp">Your organization can make a direct, measurable impact on health and lives in Ward 8.</p>
+      <h2 class="sh2">Three ways to make<br>a difference</h2>
+      <p class="sp">Every action — big or small — keeps fresh food, health care, and hope flowing to Ward 8 families.</p>
     </div>
     <div class="partner-cards" id="partner-cards">
-      <div class="pc"><div class="pc-num">01</div><h3>Underwrite Clinical Workshops</h3><p>Fund educational materials, glucose &amp; blood pressure monitoring supplies, and fresh food demo kits for our medical team's multi-week workshop series.</p></div>
-      <div class="pc"><div class="pc-num">02</div><h3>Sponsor Our DMV Grocery Route</h3><p>Fund the weekly transportation costs of sourcing fresh, healthy food from grocery partners across DC, Maryland, and Virginia.</p></div>
-      <div class="pc"><div class="pc-num">03</div><h3>Join Our Medical &amp; Volunteer Alliance</h3><p>Healthcare professionals join our clinical volunteer rotation. General volunteers assist with dignified, community-facing food distribution events.</p></div>
+      <div class="pc"><div class="pc-num">01</div><h3>Shop Our Wishlists</h3><p>Pick an item from our Amazon wishlist and ship it directly to us. Every canned good, medical supply, and hygiene kit lands where it is needed most — no middleman.</p><a href="https://www.amazon.com/hz/wishlist/ls/194FUS94MTZVR" target="_blank" class="btn-gold" style="display:inline-block;margin-top:16px;text-decoration:none;font-size:13px;">🍎 View Wishlist</a></div>
+      <div class="pc"><div class="pc-num">02</div><h3>Give Directly</h3><p>A one-time or recurring gift funds fresh food sourcing, transportation, clinical workshops, and free health screenings — all delivered free to every family, every week.</p><a href="https://givebutter.com/thejjcenter" target="_blank" class="btn-gold" style="display:inline-block;margin-top:16px;text-decoration:none;font-size:13px;">💜 Donate Now</a></div>
+      <div class="pc"><div class="pc-num">03</div><h3>Let's Talk</h3><p>Your church, business, or organization can sponsor a distribution, volunteer en masse, or partner on clinical programming. Reach out and let's build something together.</p><a href="mailto:hello@jjcenter.org" class="btn-gold" style="display:inline-block;margin-top:16px;text-decoration:none;font-size:13px;">✉ Contact Us</a></div>
     </div>
     <div class="invite-bar reveal">
       <div class="ib-text">
@@ -2130,7 +2192,16 @@ body.menu-open{overflow:hidden;}
       <h2 class="donate-h2">Every dollar<br>feeds a family.</h2>
       <p class="donate-sub">Your donation funds fresh food, transportation, clinical workshops, and medical screenings — all free to every resident who needs them.</p>
       <div class="donate-actions">
-        <a href="https://givebutter.com/thejjcenter" target="_blank" class="btn-donate">♥ &nbsp;Donate Now</a>
+        <div class="donate-dd-wrap" id="pin-dd-wrap">
+          <button class="btn-donate donate-dd-btn" id="pin-dd-btn" aria-expanded="false" onclick="toggleDonateDd('pin')">♥ &nbsp;Donate Now <span class="dd-caret">▼</span></button>
+          <div class="donate-dd" id="pin-dd-menu" role="menu" style="bottom:calc(100% + 8px);top:auto;">
+            <a class="donate-dd-item" href="https://www.amazon.com/hz/wishlist/ls/194FUS94MTZVR" target="_blank" role="menuitem"><span class="donate-dd-emoji">🍎</span><div><div class="donate-dd-label">Stock the Pantry</div><div class="donate-dd-desc">Amazon wishlist — delivered to us.</div></div></a>
+            <div class="donate-dd-divider"></div>
+            <a class="donate-dd-item" href="#" target="_blank" role="menuitem"><span class="donate-dd-emoji">🎁</span><div><div class="donate-dd-label">Gift a Christmas Smile</div><div class="donate-dd-desc">Toy or gift card for a Ward 8 child.</div></div></a>
+            <div class="donate-dd-divider"></div>
+            <a class="donate-dd-item" href="https://givebutter.com/thejjcenter" target="_blank" role="menuitem"><span class="donate-dd-emoji">💜</span><div><div class="donate-dd-label">Fuel the Mission</div><div class="donate-dd-desc">Fund food, transport, and programs.</div></div></a>
+          </div>
+        </div>
         <a href="https://www.idealist.org/en/nonprofit/45ee5baed0db4744bff95f53154528a8-the-jj-center-inc-washington" target="_blank" class="btn-volunteer">🤝 &nbsp;Volunteer With Us</a>
       </div>
       <p class="donate-note">The JJ Center, Inc. is a registered 501(c)(3) nonprofit. All donations are tax-deductible.<br>
@@ -2372,6 +2443,34 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     const el = document.getElementById(id);
     if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth'});}
   });
+});
+
+// ── Donate dropdown ──
+function closeAllDd(){
+  ['nav','hero','pin'].forEach(id=>{
+    const m=document.getElementById(id+'-dd-menu');
+    const b=document.getElementById(id+'-dd-btn');
+    if(m) m.classList.remove('open');
+    if(b) b.setAttribute('aria-expanded','false');
+  });
+}
+function toggleDonateDd(id){
+  if(id==='mobile'){
+    const m=document.getElementById('mobile-dd-menu');
+    const c=document.getElementById('mobile-dd-caret');
+    const open=m&&m.classList.contains('open');
+    if(m) m.classList.toggle('open',!open);
+    if(c) c.style.transform=open?'':'rotate(180deg)';
+    return;
+  }
+  const menu=document.getElementById(id+'-dd-menu');
+  const btn =document.getElementById(id+'-dd-btn');
+  const open=menu&&menu.classList.contains('open');
+  closeAllDd();
+  if(!open&&menu){menu.classList.add('open');if(btn)btn.setAttribute('aria-expanded','true');}
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.donate-dd-wrap')&&!e.target.closest('.mobile-dd-wrap')) closeAllDd();
 });
 </script>
 
