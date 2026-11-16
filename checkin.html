@@ -208,10 +208,12 @@ async function handleStaffQRScan(memberId) {
 
     // Valid member — log the visit
     await sb.from('visits').insert({
-      member_id:   member.id,
-      visited_at:  new Date().toISOString(),
-      visit_type:  'Staff QR Scan',
-      source:      'staff_scan'
+      member_id:     member.id,
+      visitor_name:  (member.first_name + ' ' + member.last_name).trim(),
+      visitor_email: member.email || null,
+      visited_at:    new Date().toISOString(),
+      visit_type:    'Staff QR Scan',
+      source:        'staff_scan'
     });
 
     // Show success with their name
@@ -281,13 +283,16 @@ async function memberCheckIn() {
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
     if (error) throw error;
-    await sb.from('visits').insert({
-      member_id:   data.user.id,
-      visited_at:  new Date().toISOString(),
-      visit_type:  'Member Check-In',
-      source:      'web'
-    });
     const fname = data.user.user_metadata?.first_name || 'Friend';
+    const lname = data.user.user_metadata?.last_name  || '';
+    await sb.from('visits').insert({
+      member_id:     data.user.id,
+      visitor_name:  (fname + ' ' + lname).trim(),
+      visitor_email: data.user.email || null,
+      visited_at:    new Date().toISOString(),
+      visit_type:    'Member Check-In',
+      source:        'web'
+    });
     showSuccess('member', fname, email);
     await sb.auth.signOut(); // Sign out after check-in — checkin page is not the dashboard
   } catch (err) {
@@ -308,7 +313,6 @@ async function walkInCheckIn() {
   setLoading('btn-walkin-ci', true);
   document.getElementById('ci-alert').className = 'alert';
   try {
-    const today = new Date().toISOString().split('T')[0];
     const { error: visitErr } = await sb.from('visits').insert({
       member_id:      null,
       visitor_name:   name,
@@ -321,11 +325,6 @@ async function walkInCheckIn() {
       source:         'checkin_form'
     });
     if (visitErr) throw visitErr;
-    if (email) {
-      await sb.from('invite_queue').insert({ email, name, phone: phone||null, visit_date: today, status: 'pending_email', created_at: new Date().toISOString() });
-    } else if (phone) {
-      await sb.from('invite_queue').insert({ email: null, name, phone, visit_date: today, status: 'pending_call', created_at: new Date().toISOString() });
-    }
     showSuccess('walkin', name, email);
   } catch (err) {
     showErr('Something went wrong — please ask staff for help.');
