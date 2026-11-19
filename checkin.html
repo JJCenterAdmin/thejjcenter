@@ -137,33 +137,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 
       <!-- WALK-IN PANEL -->
       <div class="pnl" id="pnl-walkin">
-        <!-- STEP 1: Basic info -->
-        <div id="walkin-step1">
-          <div class="fg"><label>ZIP Code <span style="color:var(--gold)">*</span></label><input type="text" id="w-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5"></div>
-          <div class="fg">
-            <label>Household Size <span style="color:var(--gold)">*</span></label>
-            <select id="w-household">
-              <option value="" disabled selected>Select...</option>
-              <option value="1">1 person</option>
-              <option value="2">2 people</option>
-              <option value="3-4">3&ndash;4 people</option>
-              <option value="5-6">5&ndash;6 people</option>
-              <option value="7+">7+ people</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label>Email <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
-            <input type="email" id="w-email" placeholder="your@email.com" autocomplete="email">
-            <div class="fg-note">Add your email and we will set up your account. Next time it is one tap and you will never fill this out again.</div>
-          </div>
-          <button class="btn-main" id="btn-walkin-ci" onclick="walkInContinue()">
-            <span>Continue</span><div class="spin"></div>
-          </button>
-          <div class="divider">or</div>
-          <button class="btn-secondary" onclick="switchPane('member')">Already have an account? Sign in &rarr;</button>
-        </div>
-        <!-- STEP 2: Survey (injected dynamically) -->
-        <div id="walkin-step2" style="display:none;"></div>
+        <!-- Survey loads here automatically -->
+        <div id="walkin-step2"></div>
+        <div id="walkin-loading" style="text-align:center;padding:32px 0;color:var(--muted);font-size:14px;">Loading survey...</div>
       </div>
     </div>
 
@@ -441,6 +417,10 @@ function switchPane(pane) {
   document.getElementById('pnl-member').classList.toggle('active', pane==='member');
   document.getElementById('pnl-walkin').classList.toggle('active', pane==='walkin');
   document.getElementById('ci-alert').className = 'alert';
+  if (pane === 'walkin' && !window._activeSurvey && !window._surveyLoading) {
+    window._surveyLoading = true;
+    loadWalkInSurvey();
+  }
 }
 
 function setLoading(id, on) {
@@ -563,32 +543,27 @@ async function completeMemberCheckIn() {
 // WALK-IN FLOW
 // ══════════════════════════════════════════════
 
-// Load survey on page load
+// Load and render survey when walk-in tab is shown
 window._activeSurvey = null;
-window._surveyPromise = (async () => {
+
+async function loadWalkInSurvey() {
   try {
     const { data: sv } = await sb.from('survey_versions')
       .select('*').eq('is_active', true).eq('survey_type','community').single();
+    document.getElementById('walkin-loading')?.remove();
     if (sv) {
       window._activeSurvey = sv;
       window._activeSurveyVersion = sv.version;
+      renderWalkInSurvey(sv);
+    } else {
+      // No active survey — show a simple check-in button
+      document.getElementById('walkin-step2').innerHTML =
+        '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
     }
-  } catch(_){}
-})();
-
-async function walkInContinue() {
-  const zip       = document.getElementById('w-zip').value.trim();
-  const household = document.getElementById('w-household').value;
-  if (!zip || zip.length < 5) return showErr('Please enter a valid 5-digit ZIP code.');
-  if (!household)             return showErr('Please select your household size.');
-  document.getElementById('ci-alert').className = 'alert';
-  // Wait for survey fetch to complete in case page just loaded
-  try { await window._surveyPromise; } catch(_){}
-  alert('DEBUG: survey=' + (window._activeSurvey ? 'loaded v'+window._activeSurvey.version+' q'+window._activeSurvey.questions.length : 'null'));
-  if (window._activeSurvey) {
-    renderWalkInSurvey(window._activeSurvey);
-  } else {
-    walkInCheckIn(null, true);
+  } catch(_) {
+    document.getElementById('walkin-loading')?.remove();
+    document.getElementById('walkin-step2').innerHTML =
+      '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
   }
 }
 
@@ -663,15 +638,14 @@ function renderWalkInSurvey(sv) {
     html += '</div>';
   });
 
-  // Q12: email field — only shown if no email was given in step 1
-  const step1Email = document.getElementById('w-email')?.value.trim() || '';
-  if (!step1Email) {
-    html += '<div class="sv-q" id="svq-q12">'
-      + '<div class="sv-q-label">Want to skip this form next time?</div>'
-      + '<input type="email" id="sv-q12-email" placeholder="your@email.com" autocomplete="email" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:\'Outfit\',sans-serif;color:var(--ink);background:#fff;" oninput="window._q12Email=this.value.trim()">'
-      + '<div style="font-size:12px;color:var(--light);margin-top:5px;">Add your email and we will set up your account. Next time it is one tap and you will never fill this out again.</div>'
-      + '</div>';
-  }
+  // Q12: email — always shown for walk-ins
+  html += '<div class="sv-q" id="svq-q12">'
+    + '<div class="sv-q-label">Last question, optional: Want an account so you never have to fill this out again?'
+    + ' Add your email and we will send you a link to create one.</div>'
+    + '<input type="email" id="sv-q12-email" placeholder="your@email.com" autocomplete="email"'
+    + ' style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:\'Outfit\',sans-serif;color:var(--ink);background:#fff;margin-top:8px;">'
+    + '<div style="font-size:12px;color:var(--light);margin-top:5px;">Optional. Your email is kept separate from your survey answers.</div>'
+    + '</div>';
 
   html += '<button class="btn-main" id="btn-sv-submit" onclick="walkInCheckIn(window._svAnswers,false)" style="margin-top:8px;"><span>Submit</span><div class="spin"></div></button>';
 
@@ -728,11 +702,8 @@ function svTextAnswer(qid, val) {
 
 // WALK-IN CHECK-IN — submit visit + survey, trigger invite if Q12 email given
 async function walkInCheckIn(surveyAnswers, skipped) {
-  const zip       = document.getElementById('w-zip').value.trim();
-  const household = document.getElementById('w-household').value;
-  const step1Email = document.getElementById('w-email')?.value.trim() || '';
-  const q12Email   = window._q12Email || '';
-  const finalEmail = step1Email || q12Email || null;
+  const q12Email   = (document.getElementById('sv-q12-email')?.value || '').trim();
+  const finalEmail = (q12Email && q12Email.includes('@')) ? q12Email : null;
 
   const submitBtn = document.getElementById('btn-sv-submit') || document.getElementById('btn-walkin-ci');
   if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('ld'); }
@@ -742,9 +713,7 @@ async function walkInCheckIn(surveyAnswers, skipped) {
   try {
     await sb.from('visits').insert({
       member_id:      null,
-      visitor_zip:    zip,
       visitor_email:  finalEmail,
-      household_size: household,
       visited_at:     new Date().toISOString(),
       visit_type:     'Walk-In',
       source:         'checkin_form'
@@ -766,30 +735,21 @@ async function walkInCheckIn(surveyAnswers, skipped) {
     } catch(_){}
   }
 
-  // Trigger invite if Q12 email was provided (not step 1 email — that's handled by invite-walkin-user edge fn)
-  if (q12Email && !step1Email) {
+  // Trigger invite if email provided in Q12
+  if (finalEmail) {
     try {
       await fetch(SB_URL + '/functions/v1/invite-walkin-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
-        body: JSON.stringify({ visitor_email: q12Email, visit_date: new Date().toISOString().split('T')[0] })
-      });
-    } catch(_){}
-  } else if (step1Email) {
-    // Also trigger invite for step 1 email (fail silently)
-    try {
-      await fetch(SB_URL + '/functions/v1/invite-walkin-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
-        body: JSON.stringify({ visitor_email: step1Email, visit_date: new Date().toISOString().split('T')[0] })
+        body: JSON.stringify({ visitor_email: finalEmail, visit_date: new Date().toISOString().split('T')[0] })
       });
     } catch(_){}
   }
 
-  showWalkInSuccess(finalEmail, household);
+  showWalkInSuccess(finalEmail);
 }
 
-function showWalkInSuccess(email, household) {
+function showWalkInSuccess(email) {
   document.getElementById('main-view').style.display   = 'none';
   document.getElementById('success-view').style.display = 'block';
   const now   = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -801,7 +761,7 @@ function showWalkInSuccess(email, household) {
     : 'Your visit is logged. Thank you for being part of the JJ Center community!';
   document.getElementById('success-detail').innerHTML  =
     '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>'
-    + today + ' at ' + now + (household ? ' &middot; Household: ' + escHtml(household) : '');
+    + today + ' at ' + now;
 }
 
 // Enter key
