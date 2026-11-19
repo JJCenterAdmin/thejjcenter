@@ -548,22 +548,29 @@ window._activeSurvey = null;
 
 async function loadWalkInSurvey() {
   try {
-    const { data: sv } = await sb.from('survey_versions')
+    const { data: sv, error: svErr } = await sb.from('survey_versions')
       .select('*').eq('is_active', true).eq('survey_type','community').single();
     document.getElementById('walkin-loading')?.remove();
+    if (svErr) {
+      document.getElementById('walkin-step2').innerHTML =
+        '<div style="font-size:13px;color:var(--red);padding:12px;">Survey error: ' + escHtml(JSON.stringify(svErr)) + '</div>'
+        + '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
+      return;
+    }
     if (sv) {
       window._activeSurvey = sv;
       window._activeSurveyVersion = sv.version;
       renderWalkInSurvey(sv);
     } else {
-      // No active survey — show a simple check-in button
       document.getElementById('walkin-step2').innerHTML =
-        '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
+        '<div style="font-size:13px;color:var(--red);padding:12px;">No active survey found.</div>'
+        + '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
     }
-  } catch(_) {
+  } catch(e) {
     document.getElementById('walkin-loading')?.remove();
     document.getElementById('walkin-step2').innerHTML =
-      '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
+      '<div style="font-size:13px;color:var(--red);padding:12px;">Exception: ' + escHtml(String(e)) + '</div>'
+      + '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
   }
 }
 
