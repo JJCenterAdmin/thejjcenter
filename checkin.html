@@ -565,7 +565,7 @@ async function completeMemberCheckIn() {
 
 // Load survey on page load
 window._activeSurvey = null;
-(async () => {
+window._surveyPromise = (async () => {
   try {
     const { data: sv } = await sb.from('survey_versions')
       .select('*').eq('is_active', true).eq('survey_type','community').single();
@@ -576,12 +576,14 @@ window._activeSurvey = null;
   } catch(_){}
 })();
 
-function walkInContinue() {
+async function walkInContinue() {
   const zip       = document.getElementById('w-zip').value.trim();
   const household = document.getElementById('w-household').value;
   if (!zip || zip.length < 5) return showErr('Please enter a valid 5-digit ZIP code.');
   if (!household)             return showErr('Please select your household size.');
   document.getElementById('ci-alert').className = 'alert';
+  // Wait for survey fetch to complete in case page just loaded
+  try { await window._surveyPromise; } catch(_){}
   if (window._activeSurvey) {
     renderWalkInSurvey(window._activeSurvey);
   } else {
