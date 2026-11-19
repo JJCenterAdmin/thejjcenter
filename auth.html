@@ -568,7 +568,17 @@ async function doSignup() {
     if (data.session) {
       // Email confirmation is disabled on this project — already signed in.
       document.getElementById('suc-msg').textContent = 'Your account is ready! Taking you to your dashboard...';
-      setTimeout(() => location.href = 'dashboard.html', 1500);
+      setTimeout(async () => {
+        try {
+          const { data: sv } = await sb.from('survey_versions').select('version').eq('is_active',true).single();
+          if (sv) {
+            let lsDone = false;
+            try { lsDone = !!localStorage.getItem('jj_survey_done_v'+sv.version); } catch(_){}
+            if (!lsDone) { location.href = 'survey.html?source=account'; return; }
+          }
+        } catch(_){}
+        location.href = 'dashboard.html';
+      }, 1500);
     } else {
       document.getElementById('suc-msg').textContent = 'We sent a confirmation email to ' + em + '. Click the link to activate your account, then come back to sign in.';
     }
