@@ -289,6 +289,13 @@ async function submitSurvey() {
       source: source
     });
     try { localStorage.setItem('jj_survey_done_v' + surveyVersion, '1'); } catch(_){}
+    // Update members table if signed in
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        await sb.from('members').update({ survey_done_version: surveyVersion }).eq('id', session.user.id);
+      }
+    } catch(_){}
   } catch(_) {
     // Fail silently
     try { localStorage.setItem('jj_survey_done_v' + surveyVersion, '1'); } catch(_){}

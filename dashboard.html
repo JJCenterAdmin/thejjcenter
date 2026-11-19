@@ -827,7 +827,7 @@ async function loadDashboard() {
   // Claim walk-in profile if applicable
   try { await sb.rpc('claim_walkin_profile'); } catch(_){}
 
-  // Survey banner if not done
+  // Survey notification bar if not done
   try {
     const { data: sv } = await sb.from('survey_versions').select('version').eq('is_active',true).single();
     if (sv) {
@@ -835,11 +835,15 @@ async function loadDashboard() {
       try { lsDone = !!localStorage.getItem('jj_survey_done_v'+sv.version); } catch(_){}
       const svDone = memberData?.survey_done_version >= sv.version;
       if (!lsDone && !svDone) {
-        const banner = document.createElement('div');
-        banner.id = 'survey-banner';
-        banner.style.cssText = 'background:var(--p3);color:#fff;padding:16px 24px;text-align:center;position:fixed;bottom:0;left:0;right:0;z-index:999;';
-        banner.innerHTML = '<strong>Help us improve!</strong> Take our 2-minute community survey. <a href="/survey.html?source=account" style="color:var(--gold2);font-weight:700;margin-left:12px;">Start Survey</a> <button onclick="this.parentNode.remove()" style="background:none;border:none;color:#ccc;margin-left:16px;cursor:pointer;font-size:18px;line-height:1;">&times;</button>';
-        document.body.appendChild(banner);
+        const bar = document.createElement('div');
+        bar.id = 'survey-bar';
+        bar.style.cssText = 'background:var(--p3);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
+        bar.innerHTML = '<span style="flex:1;font-size:15px;"><strong>Help us serve you better:</strong> Fill out our short community survey.</span>'
+          + '<a href="/survey.html?source=account" style="background:var(--gold);color:#16082b;font-weight:700;padding:8px 18px;border-radius:6px;text-decoration:none;white-space:nowrap;">Take Survey</a>'
+          + '<button onclick="document.getElementById(\'survey-bar\').remove()" style="background:none;border:none;color:#ccc;font-size:20px;cursor:pointer;padding:0 4px;">&#x2715;</button>';
+        const nav = document.querySelector('nav, header, #nav, #topbar, .topbar');
+        if (nav && nav.parentNode) nav.parentNode.insertBefore(bar, nav.nextSibling);
+        else document.body.prepend(bar);
       }
     }
   } catch(_){}

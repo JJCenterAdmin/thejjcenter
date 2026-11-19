@@ -67,6 +67,28 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 .nf-box{background:#fff8ed;border:1px solid #f5d99a;border-radius:12px;padding:16px;font-size:14px;color:#7a5200;line-height:1.7;margin-bottom:16px;}
 .btn-reset{background:transparent;border:1.5px solid var(--border);color:var(--p3);padding:13px 28px;border-radius:100px;font-size:14px;cursor:pointer;font-family:'Outfit',sans-serif;}
 .footer-note{text-align:center;font-size:12px;color:var(--light);margin-top:20px;line-height:1.6;}
+/* Survey step 2 */
+.sv-intro-box{background:#f3eeff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;}
+.sv-skip-row{display:flex;justify-content:flex-end;margin-bottom:12px;}
+.btn-sv-skip{background:transparent;border:none;color:var(--light);font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:underline;}
+.sv-q{margin-bottom:18px;}
+.sv-q-label{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px;line-height:1.4;}
+.sv-opts{display:flex;flex-direction:column;gap:7px;}
+.sv-opt{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;}
+.sv-opt:hover{border-color:var(--p3);background:#f3eeff;}
+.sv-opt.sel{border-color:var(--p3);background:#ece3ff;}
+.sv-opt input{width:15px;height:15px;accent-color:var(--p3);flex-shrink:0;}
+.sv-opt span{font-size:14px;color:var(--ink);}
+.sv-hint{font-size:11px;color:var(--light);margin-bottom:6px;}
+.sv-textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Outfit',sans-serif;color:var(--ink);resize:vertical;min-height:70px;}
+.sv-textarea:focus{outline:none;border-color:var(--p3);}
+.sv-grid{overflow-x:auto;}
+.sv-grid table{width:100%;border-collapse:collapse;min-width:280px;}
+.sv-grid th{font-size:11px;font-weight:600;color:var(--muted);text-align:center;padding:5px 3px;}
+.sv-grid th.rl{text-align:left;}
+.sv-grid td{text-align:center;padding:7px 3px;border-top:1px solid var(--border);}
+.sv-grid td.rl{text-align:left;font-size:13px;color:var(--ink);}
+.sv-cond{display:none;}
 </style>
 </head>
 <body>
@@ -102,34 +124,39 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 
       <!-- WALK-IN PANEL -->
       <div class="pnl" id="pnl-walkin">
-        <div class="fg"><label>Full Name <span style="color:var(--gold)">*</span></label><input type="text" id="w-name" placeholder="Your name" autocomplete="name"></div>
-        <div class="fg"><label>ZIP Code <span style="color:var(--gold)">*</span></label><input type="text" id="w-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5"></div>
-        <div class="fg">
-          <label>Household Size <span style="color:var(--gold)">*</span></label>
-          <select id="w-household">
-            <option value="" disabled selected>Select...</option>
-            <option value="1">1 person</option>
-            <option value="2">2 people</option>
-            <option value="3-4">3&ndash;4 people</option>
-            <option value="5-6">5&ndash;6 people</option>
-            <option value="7+">7+ people</option>
-          </select>
+        <!-- STEP 1: Basic info -->
+        <div id="walkin-step1">
+          <div class="fg"><label>Full Name <span style="color:var(--gold)">*</span></label><input type="text" id="w-name" placeholder="Your name" autocomplete="name"></div>
+          <div class="fg"><label>ZIP Code <span style="color:var(--gold)">*</span></label><input type="text" id="w-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5"></div>
+          <div class="fg">
+            <label>Household Size <span style="color:var(--gold)">*</span></label>
+            <select id="w-household">
+              <option value="" disabled selected>Select...</option>
+              <option value="1">1 person</option>
+              <option value="2">2 people</option>
+              <option value="3-4">3&ndash;4 people</option>
+              <option value="5-6">5&ndash;6 people</option>
+              <option value="7+">7+ people</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Email <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
+            <input type="email" id="w-email" placeholder="your@email.com" autocomplete="email">
+            <div class="fg-note">We&rsquo;ll invite you to create a free account</div>
+          </div>
+          <div class="fg">
+            <label>Phone <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
+            <input type="tel" id="w-phone" placeholder="(202) 555-0000" inputmode="tel" autocomplete="tel">
+            <div class="fg-note">If no email, we may follow up by phone</div>
+          </div>
+          <button class="btn-main" id="btn-walkin-ci" onclick="walkInContinue()">
+            <span>Continue</span><div class="spin"></div>
+          </button>
+          <div class="divider">or</div>
+          <button class="btn-secondary" onclick="switchPane('member')">Already have an account? Sign in &rarr;</button>
         </div>
-        <div class="fg">
-          <label>Email <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
-          <input type="email" id="w-email" placeholder="your@email.com" autocomplete="email">
-          <div class="fg-note">We&rsquo;ll invite you to create a free account</div>
-        </div>
-        <div class="fg">
-          <label>Phone <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
-          <input type="tel" id="w-phone" placeholder="(202) 555-0000" inputmode="tel" autocomplete="tel">
-          <div class="fg-note">If no email, we may follow up by phone</div>
-        </div>
-        <button class="btn-main" id="btn-walkin-ci" onclick="walkInCheckIn()">
-          <span>Submit &amp; Check In</span><div class="spin"></div>
-        </button>
-        <div class="divider">or</div>
-        <button class="btn-secondary" onclick="switchPane('member')">Already have an account? Sign in &rarr;</button>
+        <!-- STEP 2: Survey (injected dynamically) -->
+        <div id="walkin-step2" style="display:none;"></div>
       </div>
     </div>
 
@@ -360,17 +387,141 @@ async function memberCheckIn() {
   } finally { setLoading('btn-member-ci', false); }
 }
 
-// WALK-IN CHECK-IN
-async function walkInCheckIn() {
+// Load survey on page load
+window._activeSurvey = null;
+(async () => {
+  try {
+    const { data: sv } = await sb.from('survey_versions').select('*').eq('is_active', true).single();
+    if (sv) window._activeSurvey = sv;
+  } catch(_){}
+})();
+
+// WALK-IN STEP 1 — validate and proceed to survey or submit
+function walkInContinue() {
+  const name      = document.getElementById('w-name').value.trim();
+  const zip       = document.getElementById('w-zip').value.trim();
+  const household = document.getElementById('w-household').value;
+  if (!name)                  return showErr('Please enter your name.');
+  if (!zip || zip.length < 5) return showErr('Please enter a valid 5-digit ZIP code.');
+  if (!household)             return showErr('Please select your household size.');
+  document.getElementById('ci-alert').className = 'alert';
+  if (window._activeSurvey) {
+    renderWalkInSurvey(window._activeSurvey);
+  } else {
+    walkInCheckIn(null, true);
+  }
+}
+
+function renderWalkInSurvey(sv) {
+  const step1 = document.getElementById('walkin-step1');
+  const step2 = document.getElementById('walkin-step2');
+  step1.style.display = 'none';
+  window._svAnswers = {};
+
+  let html = '<div class="sv-skip-row"><button class="btn-sv-skip" onclick="walkInCheckIn(null,true)">Skip Survey</button></div>';
+  html += '<div class="sv-intro-box">' + escHtml(sv.intro_text) + '</div>';
+
+  (sv.questions || []).forEach((q, idx) => {
+    const cond = q.conditional ? ' sv-cond" data-cond-dep="' + escHtml(q.conditional.depends_on) + '" data-cond-val="' + escHtml(q.conditional.show_when) + '"' : '"';
+    html += '<div class="sv-q' + (q.conditional ? ' sv-cond' : '') + '" id="svq-' + escHtml(q.id) + '"'
+      + (q.conditional ? ' data-cond-dep="' + escHtml(q.conditional.depends_on) + '" data-cond-val="' + escHtml(q.conditional.show_when) + '"' : '') + '>';
+    html += '<div class="sv-q-label">' + (idx+1) + '. ' + escHtml(q.text) + '</div>';
+
+    if (q.type === 'single_choice') {
+      html += '<div class="sv-opts">';
+      q.options.forEach(opt => {
+        html += '<label class="sv-opt" onclick="svPickSingle(this,\'' + escHtml(q.id) + '\',\'' + escHtml(opt) + '\')">'
+          + '<input type="radio" name="svq_' + escHtml(q.id) + '" value="' + escHtml(opt) + '">'
+          + '<span>' + escHtml(opt) + '</span></label>';
+      });
+      html += '</div>';
+    } else if (q.type === 'multi_choice') {
+      const max = q.max_selections || 99;
+      html += '<div class="sv-hint">' + (q.max_selections ? 'Choose up to ' + max : 'Check all that apply') + '</div>';
+      html += '<div class="sv-opts">';
+      q.options.forEach(opt => {
+        html += '<label class="sv-opt" onclick="svPickMulti(this,\'' + escHtml(q.id) + '\',' + max + ')">'
+          + '<input type="checkbox" name="svq_' + escHtml(q.id) + '" value="' + escHtml(opt) + '">'
+          + '<span>' + escHtml(opt) + '</span></label>';
+      });
+      html += '</div>';
+    } else if (q.type === 'rating_grid') {
+      const sc = q.scale || {min:1,max:5,labels:['Poor','Excellent']};
+      const nums = [];
+      for (let i = sc.min; i <= sc.max; i++) nums.push(i);
+      html += '<div class="sv-grid"><table><thead><tr><th class="rl"></th>';
+      nums.forEach((n, i) => {
+        let lbl = n;
+        if (i === 0 && sc.labels?.[0]) lbl = n + '<br><small style="font-weight:400;color:#999">' + escHtml(sc.labels[0]) + '</small>';
+        if (i === nums.length-1 && sc.labels?.[1]) lbl = n + '<br><small style="font-weight:400;color:#999">' + escHtml(sc.labels[1]) + '</small>';
+        html += '<th>' + lbl + '</th>';
+      });
+      html += '</tr></thead><tbody>';
+      (q.rows||[]).forEach(row => {
+        html += '<tr><td class="rl">' + escHtml(row) + '</td>';
+        nums.forEach(n => {
+          html += '<td><input type="radio" name="svgrid_' + escHtml(q.id) + '_' + escHtml(row) + '" value="' + n
+            + '" onchange="svGridAnswer(\'' + escHtml(q.id) + '\',\'' + escHtml(row) + '\',' + n + ')"></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    } else if (q.type === 'open_text') {
+      html += '<textarea class="sv-textarea" placeholder="Your answer (optional)" rows="3" oninput="svTextAnswer(\'' + escHtml(q.id) + '\',this.value)"></textarea>';
+    }
+    html += '</div>';
+  });
+
+  html += '<button class="btn-main" id="btn-sv-submit" onclick="walkInCheckIn(window._svAnswers,false)" style="margin-top:8px;"><span>Submit</span><div class="spin"></div></button>';
+
+  step2.innerHTML = html;
+  step2.style.display = 'block';
+}
+
+function svPickSingle(label, qid, val) {
+  const list = label.closest('.sv-opts');
+  list.querySelectorAll('.sv-opt').forEach(el => el.classList.remove('sel'));
+  label.classList.add('sel');
+  window._svAnswers[qid] = val;
+  // Conditionals
+  document.querySelectorAll('#walkin-step2 .sv-cond').forEach(el => {
+    if (el.dataset.condDep === qid) {
+      el.style.display = (val === el.dataset.condVal) ? 'block' : 'none';
+      if (val !== el.dataset.condVal) delete window._svAnswers[el.id.replace('svq-','')];
+    }
+  });
+}
+
+function svPickMulti(label, qid, max) {
+  const list = label.closest('.sv-opts');
+  const checked = list.querySelectorAll('input:checked');
+  if (!label.classList.contains('sel') && checked.length >= max) {
+    label.querySelector('input').checked = false;
+    return;
+  }
+  label.classList.toggle('sel', label.querySelector('input').checked);
+  window._svAnswers[qid] = Array.from(list.querySelectorAll('input:checked')).map(i => i.value);
+}
+
+function svGridAnswer(qid, row, val) {
+  if (!window._svAnswers[qid]) window._svAnswers[qid] = {};
+  window._svAnswers[qid][row] = val;
+}
+
+function svTextAnswer(qid, val) {
+  if (val.trim()) window._svAnswers[qid] = val.trim();
+  else delete window._svAnswers[qid];
+}
+
+// WALK-IN CHECK-IN — called after survey step or directly on skip
+async function walkInCheckIn(surveyAnswers, skipped) {
   const name      = document.getElementById('w-name').value.trim();
   const zip       = document.getElementById('w-zip').value.trim();
   const household = document.getElementById('w-household').value;
   const email     = document.getElementById('w-email').value.trim();
   const phone     = document.getElementById('w-phone').value.trim();
-  if (!name)               return showErr('Please enter your name.');
-  if (!zip || zip.length < 5) return showErr('Please enter a valid 5-digit ZIP code.');
-  if (!household)          return showErr('Please select your household size.');
-  setLoading('btn-walkin-ci', true);
+  const submitBtn = document.getElementById('btn-sv-submit') || document.getElementById('btn-walkin-ci');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('ld'); }
   document.getElementById('ci-alert').className = 'alert';
   try {
     const { error: visitErr } = await sb.from('visits').insert({
@@ -385,11 +536,23 @@ async function walkInCheckIn() {
       source:         'checkin_form'
     });
     if (visitErr) throw visitErr;
+    // Save survey response if not skipped and answers exist
+    if (!skipped && surveyAnswers && window._activeSurvey && Object.keys(surveyAnswers).length > 0) {
+      try {
+        await sb.from('survey_responses').insert({
+          survey_version: window._activeSurvey.version,
+          answers: surveyAnswers,
+          source: 'checkin'
+        });
+        try { localStorage.setItem('jj_survey_done_v' + window._activeSurvey.version, '1'); } catch(_){}
+      } catch(_){}
+    }
     showSuccess('walkin', name, email);
   } catch (err) {
     showErr('Something went wrong — please ask staff for help.');
     console.error(err);
-  } finally { setLoading('btn-walkin-ci', false); }
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('ld'); }
+  }
 }
 
 // SUCCESS DISPLAY
@@ -414,17 +577,6 @@ function showSuccess(type, name, email) {
       ? 'Your visit is logged. Check your inbox — we\'ll send you a link to create your free JJ Center account.'
       : 'Your visit is logged. Thank you for being part of the JJ Center community!';
     det.innerHTML = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now + ' &middot; Household: ' + (document.getElementById('w-household')?.value || '');
-    // Survey prompt for walk-ins
-    setTimeout(() => {
-      const sv = document.getElementById('success-view');
-      if (!sv) return;
-      const surveyDiv = document.createElement('div');
-      surveyDiv.style.cssText = 'margin-top:18px;padding:16px;background:#f3eeff;border:1px solid var(--border);border-radius:12px;text-align:center;';
-      surveyDiv.innerHTML = '<p style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Help us serve you better, take our quick 2-minute community survey.</p>' +
-        '<a href="/survey.html?source=checkin" style="display:inline-block;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:600;text-decoration:none;margin-right:10px;">Take Survey</a>' +
-        '<button onclick="this.closest(\'div\').remove()" style="background:transparent;border:none;font-size:13px;color:var(--light);cursor:pointer;font-family:\'Outfit\',sans-serif;">No thanks</button>';
-      sv.appendChild(surveyDiv);
-    }, 400);
   }
 }
 
@@ -432,7 +584,7 @@ function showSuccess(type, name, email) {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (document.getElementById('pnl-member')?.classList.contains('active')) memberCheckIn();
-  else walkInCheckIn();
+  else if (document.getElementById('walkin-step1')?.style.display !== 'none') walkInContinue();
 });
 </script>
 </body>
