@@ -584,6 +584,7 @@ async function walkInContinue() {
   document.getElementById('ci-alert').className = 'alert';
   // Wait for survey fetch to complete in case page just loaded
   try { await window._surveyPromise; } catch(_){}
+  alert('DEBUG: survey=' + (window._activeSurvey ? 'loaded v'+window._activeSurvey.version+' q'+window._activeSurvey.questions.length : 'null'));
   if (window._activeSurvey) {
     renderWalkInSurvey(window._activeSurvey);
   } else {
