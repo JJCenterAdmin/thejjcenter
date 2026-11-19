@@ -551,26 +551,18 @@ async function loadWalkInSurvey() {
     const { data: sv, error: svErr } = await sb.from('survey_versions')
       .select('*').eq('is_active', true).eq('survey_type','community').single();
     document.getElementById('walkin-loading')?.remove();
-    if (svErr) {
+    if (svErr || !sv) {
       document.getElementById('walkin-step2').innerHTML =
-        '<div style="font-size:13px;color:var(--red);padding:12px;">Survey error: ' + escHtml(JSON.stringify(svErr)) + '</div>'
-        + '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
+        '<div style="font-size:13px;color:var(--red);padding:12px 0;">Could not load the survey. Please ask a staff member for help.</div>';
       return;
     }
-    if (sv) {
-      window._activeSurvey = sv;
-      window._activeSurveyVersion = sv.version;
-      renderWalkInSurvey(sv);
-    } else {
-      document.getElementById('walkin-step2').innerHTML =
-        '<div style="font-size:13px;color:var(--red);padding:12px;">No active survey found.</div>'
-        + '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
-    }
+    window._activeSurvey = sv;
+    window._activeSurveyVersion = sv.version;
+    renderWalkInSurvey(sv);
   } catch(e) {
     document.getElementById('walkin-loading')?.remove();
     document.getElementById('walkin-step2').innerHTML =
-      '<div style="font-size:13px;color:var(--red);padding:12px;">Exception: ' + escHtml(String(e)) + '</div>'
-      + '<button class="btn-main" onclick="walkInCheckIn(null,true)"><span>Check In</span><div class="spin"></div></button>';
+      '<div style="font-size:13px;color:var(--red);padding:12px 0;">Could not load the survey. Please ask a staff member for help.</div>';
   }
 }
 
@@ -578,7 +570,7 @@ function renderWalkInSurvey(sv) {
   const step2 = document.getElementById('walkin-step2');
   window._svAnswers = {};
 
-  let html = '<div class="sv-skip-row"><button class="btn-sv-skip" onclick="walkInCheckIn(null,true)">Skip Survey</button></div>';
+  let html = '';
   html += '<div class="sv-intro-box">' + escHtml(sv.intro_text) + '</div>';
 
   (sv.questions || []).forEach((q, idx) => {
@@ -728,7 +720,7 @@ async function walkInCheckIn(surveyAnswers, skipped) {
   }
 
   // Save survey response (fail silently)
-  if (!skipped && surveyAnswers && window._activeSurvey && Object.keys(surveyAnswers).length > 0) {
+  if (surveyAnswers && window._activeSurvey && Object.keys(surveyAnswers).length > 0) {
     try {
       await sb.from('survey_responses').insert({
         survey_version: window._activeSurvey.version,
