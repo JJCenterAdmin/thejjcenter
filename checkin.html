@@ -185,6 +185,66 @@ const sb     = window.supabase.createClient(SB_URL, SB_KEY);
 const params = new URLSearchParams(location.search);
 const midFromQR = params.get('mid');
 
+// Check if already signed in — skip the form for members
+(async () => {
+  if (midFromQR) return; // QR scan flow takes precedence
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    // Load member profile
+    const { data: member } = await sb.from('members')
+      .select('first_name,last_name,email,zip_code,household_size')
+      .eq('id', session.user.id).single();
+    const fname = member?.first_name || session.user.user_metadata?.first_name || 'Friend';
+    const lname = member?.last_name || session.user.user_metadata?.last_name || '';
+    const email = member?.email || session.user.email || '';
+    // Hide normal UI
+    document.querySelector('.choice-bar').style.display = 'none';
+    document.getElementById('main-view').innerHTML = `
+      <div style="text-align:center;padding:16px 0;">
+        <div style="font-size:52px;margin-bottom:14px;">👋</div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--p2);margin-bottom:8px;">Welcome back, ${escHtml(fname)}!</h2>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px;">Tap the button below to log your visit today.</p>
+        <button class="btn-main" id="btn-member-auto" onclick="autoMemberCheckIn()" style="max-width:260px;margin:0 auto;">
+          <span>Check In Now</span><div class="spin"></div>
+        </button>
+      </div>`;
+    document.getElementById('main-view').style.display = 'block';
+    // Store for use in autoMemberCheckIn
+    window._autoMember = { session, fname, lname, email };
+  } catch(_){}
+})();
+
+async function autoMemberCheckIn() {
+  if (!window._autoMember) return;
+  const { session, fname, lname, email } = window._autoMember;
+  setLoading('btn-member-auto', true);
+  try {
+    const { error } = await sb.from('visits').insert({
+      member_id:     session.user.id,
+      visitor_name:  (fname + ' ' + lname).trim(),
+      visitor_email: email || null,
+      visited_at:    new Date().toISOString(),
+      visit_type:    'Member Check-In',
+      source:        'web'
+    });
+    if (error) throw error;
+    document.getElementById('main-view').style.display = 'none';
+    document.getElementById('success-view').style.display = 'block';
+    document.getElementById('success-icon').textContent = '✅';
+    document.getElementById('success-title').textContent = fname + ' is checked in!';
+    document.getElementById('success-msg').textContent = 'Welcome back! Your visit has been logged.';
+    const now = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    const today = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    document.getElementById('success-detail').innerHTML = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now;
+  } catch(err) {
+    setLoading('btn-member-auto', false);
+    showErr('Something went wrong. Please ask staff for help.');
+  }
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 if (midFromQR) {
   // Hide the normal check-in UI immediately
   document.querySelector('.choice-bar').style.display = 'none';
@@ -354,6 +414,17 @@ function showSuccess(type, name, email) {
       ? 'Your visit is logged. Check your inbox — we\'ll send you a link to create your free JJ Center account.'
       : 'Your visit is logged. Thank you for being part of the JJ Center community!';
     det.innerHTML = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now + ' &middot; Household: ' + (document.getElementById('w-household')?.value || '');
+    // Survey prompt for walk-ins
+    setTimeout(() => {
+      const sv = document.getElementById('success-view');
+      if (!sv) return;
+      const surveyDiv = document.createElement('div');
+      surveyDiv.style.cssText = 'margin-top:18px;padding:16px;background:#f3eeff;border:1px solid var(--border);border-radius:12px;text-align:center;';
+      surveyDiv.innerHTML = '<p style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Help us serve you better, take our quick 2-minute community survey.</p>' +
+        '<a href="/survey.html?source=checkin" style="display:inline-block;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:600;text-decoration:none;margin-right:10px;">Take Survey</a>' +
+        '<button onclick="this.closest(\'div\').remove()" style="background:transparent;border:none;font-size:13px;color:var(--light);cursor:pointer;font-family:\'Outfit\',sans-serif;">No thanks</button>';
+      sv.appendChild(surveyDiv);
+    }, 400);
   }
 }
 

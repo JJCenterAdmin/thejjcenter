@@ -409,10 +409,26 @@ if (new URLSearchParams(location.search).get('timeout')) setTimeout(() => alert(
 // UI HELPERS
 // ═══════════════════════════════════════════════
 
-// Auto-switch to Sign In tab if URL has #signin
+// Auto-switch to Sign In tab if URL has #signin or ?type=invite
 window.addEventListener('DOMContentLoaded', () => {
   if (location.hash === '#signin') swTab('in');
+  if (new URLSearchParams(location.search).get('type') === 'invite') showInviteWelcome();
 });
+
+function showInviteWelcome() {
+  // Insert a welcome banner above the tabs for invite sign-ins
+  const right = document.querySelector('.right');
+  const existing = document.getElementById('invite-banner');
+  if (existing) return;
+  const banner = document.createElement('div');
+  banner.id = 'invite-banner';
+  banner.style.cssText = 'background:linear-gradient(135deg,var(--p2),var(--p3));border-radius:14px;padding:20px 22px;margin-bottom:22px;';
+  banner.innerHTML = '<h2 style="font-family:var(--serif);font-size:22px;font-weight:600;color:white;margin-bottom:8px;">Create your account</h2>' +
+    '<p style="font-size:14px;color:rgba(196,168,245,.85);line-height:1.7;">Welcome to The JJ Center family. Choose a way to sign in and your account is ready. You will not need to fill out the check-in form again.</p>';
+  const main = document.getElementById('main');
+  right.insertBefore(banner, main);
+  swTab('up');
+}
 
 function swTab(t) {
   document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('on', (t === 'up' && i === 0) || (t === 'in' && i === 1)));
@@ -635,7 +651,17 @@ async function verifyCode() {
       type: 'email'
     });
     if (error) throw error;
-    window._sa = true; startSess(); location.href = 'dashboard.html';
+    window._sa = true; startSess();
+    try { await sb.rpc('claim_walkin_profile'); } catch(_){}
+    try {
+      const { data: sv } = await sb.from('survey_versions').select('version').eq('is_active',true).single();
+      if (sv) {
+        let lsDone = false;
+        try { lsDone = !!localStorage.getItem('jj_survey_done_v'+sv.version); } catch(_){}
+        if (!lsDone) { location.href = 'survey.html?source=account'; return; }
+      }
+    } catch(_){}
+    location.href = 'dashboard.html';
   } catch (err) {
     alert('al-tfac', 'err',
       err.message?.includes('expired') ? 'Code expired. Please go back and request a new one.' :

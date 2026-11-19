@@ -33,8 +33,12 @@ returns trigger language plpgsql security definer as $$
 declare
   v_visit_date date;
 begin
-  -- Only process walk-ins with an email
-  if NEW.source <> 'checkin_form' or NEW.visitor_email is null then
+  -- Only process walk-ins with an email, no existing member, correct type
+  if NEW.source <> 'checkin_form'
+     or NEW.visit_type <> 'Walk-In'
+     or NEW.member_id is not null
+     or NEW.visitor_email is null
+     or trim(NEW.visitor_email) = '' then
     return NEW;
   end if;
 

@@ -31,7 +31,8 @@ Deno.serve(async (req) => {
     }
 
     const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(visitor_email, {
-      data: { full_name: visitor_name }
+      data: { full_name: visitor_name },
+      redirectTo: 'https://www.jjcenter.org/auth.html?type=invite'
     })
 
     if (inviteError) {

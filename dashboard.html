@@ -823,6 +823,26 @@ async function loadDashboard() {
 
   document.getElementById('dash-loading').style.display = 'none';
   showView('home');
+
+  // Claim walk-in profile if applicable
+  try { await sb.rpc('claim_walkin_profile'); } catch(_){}
+
+  // Survey banner if not done
+  try {
+    const { data: sv } = await sb.from('survey_versions').select('version').eq('is_active',true).single();
+    if (sv) {
+      let lsDone = false;
+      try { lsDone = !!localStorage.getItem('jj_survey_done_v'+sv.version); } catch(_){}
+      const svDone = memberData?.survey_done_version >= sv.version;
+      if (!lsDone && !svDone) {
+        const banner = document.createElement('div');
+        banner.id = 'survey-banner';
+        banner.style.cssText = 'background:var(--p3);color:#fff;padding:16px 24px;text-align:center;position:fixed;bottom:0;left:0;right:0;z-index:999;';
+        banner.innerHTML = '<strong>Help us improve!</strong> Take our 2-minute community survey. <a href="/survey.html?source=account" style="color:var(--gold2);font-weight:700;margin-left:12px;">Start Survey</a> <button onclick="this.parentNode.remove()" style="background:none;border:none;color:#ccc;margin-left:16px;cursor:pointer;font-size:18px;line-height:1;">&times;</button>';
+        document.body.appendChild(banner);
+      }
+    }
+  } catch(_){}
 }
 
 // ── Visit History ──
