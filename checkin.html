@@ -575,9 +575,7 @@ async function loadWalkInSurvey() {
 }
 
 function renderWalkInSurvey(sv) {
-  const step1 = document.getElementById('walkin-step1');
   const step2 = document.getElementById('walkin-step2');
-  step1.style.display = 'none';
   window._svAnswers = {};
 
   let html = '<div class="sv-skip-row"><button class="btn-sv-skip" onclick="walkInCheckIn(null,true)">Skip Survey</button></div>';
