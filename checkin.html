@@ -126,7 +126,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
       <div class="pnl" id="pnl-walkin">
         <!-- STEP 1: Basic info -->
         <div id="walkin-step1">
-          <div class="fg"><label>Full Name <span style="color:var(--gold)">*</span></label><input type="text" id="w-name" placeholder="Your name" autocomplete="name"></div>
           <div class="fg"><label>ZIP Code <span style="color:var(--gold)">*</span></label><input type="text" id="w-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5"></div>
           <div class="fg">
             <label>Household Size <span style="color:var(--gold)">*</span></label>
@@ -142,12 +141,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
           <div class="fg">
             <label>Email <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
             <input type="email" id="w-email" placeholder="your@email.com" autocomplete="email">
-            <div class="fg-note">We&rsquo;ll invite you to create a free account</div>
-          </div>
-          <div class="fg">
-            <label>Phone <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
-            <input type="tel" id="w-phone" placeholder="(202) 555-0000" inputmode="tel" autocomplete="tel">
-            <div class="fg-note">If no email, we may follow up by phone</div>
+            <div class="fg-note">Only needed if you want a free account with us. This form is otherwise anonymous.</div>
           </div>
           <button class="btn-main" id="btn-walkin-ci" onclick="walkInContinue()">
             <span>Continue</span><div class="spin"></div>
@@ -398,10 +392,8 @@ window._activeSurvey = null;
 
 // WALK-IN STEP 1 — validate and proceed to survey or submit
 function walkInContinue() {
-  const name      = document.getElementById('w-name').value.trim();
   const zip       = document.getElementById('w-zip').value.trim();
   const household = document.getElementById('w-household').value;
-  if (!name)                  return showErr('Please enter your name.');
   if (!zip || zip.length < 5) return showErr('Please enter a valid 5-digit ZIP code.');
   if (!household)             return showErr('Please select your household size.');
   document.getElementById('ci-alert').className = 'alert';
@@ -515,21 +507,17 @@ function svTextAnswer(qid, val) {
 
 // WALK-IN CHECK-IN — called after survey step or directly on skip
 async function walkInCheckIn(surveyAnswers, skipped) {
-  const name      = document.getElementById('w-name').value.trim();
   const zip       = document.getElementById('w-zip').value.trim();
   const household = document.getElementById('w-household').value;
   const email     = document.getElementById('w-email').value.trim();
-  const phone     = document.getElementById('w-phone').value.trim();
   const submitBtn = document.getElementById('btn-sv-submit') || document.getElementById('btn-walkin-ci');
   if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('ld'); }
   document.getElementById('ci-alert').className = 'alert';
   try {
     const { error: visitErr } = await sb.from('visits').insert({
       member_id:      null,
-      visitor_name:   name,
       visitor_zip:    zip,
       visitor_email:  email || null,
-      visitor_phone:  phone || null,
       household_size: household,
       visited_at:     new Date().toISOString(),
       visit_type:     'Walk-In',
