@@ -70,7 +70,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 /* Survey step 2 */
 .sv-intro-box{background:#f3eeff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;}
 .sv-skip-row{display:flex;justify-content:flex-end;margin-bottom:12px;}
-.btn-sv-skip{background:transparent;border:none;color:var(--light);font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:underline;}
+.btn-sv-skip{background:transparent;border:none;color:var(--light);font-size:15px;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:underline;padding:6px 0;}
 .sv-q{margin-bottom:18px;}
 .sv-q-label{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px;line-height:1.4;}
 .sv-opts{display:flex;flex-direction:column;gap:7px;}
@@ -89,6 +89,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 .sv-grid td{text-align:center;padding:7px 3px;border-top:1px solid var(--border);}
 .sv-grid td.rl{text-align:left;font-size:13px;color:var(--ink);}
 .sv-cond{display:none;}
+.sv-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Outfit',sans-serif;color:var(--ink);background:#fff;transition:border-color .2s;}
+.sv-select:focus{outline:none;border-color:var(--p3);}
+/* Profile update card */
+.profile-upd-card{background:#f3eeff;border:1.5px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;}
+.profile-upd-title{font-size:14px;font-weight:700;color:var(--p3);margin-bottom:4px;}
+.profile-upd-sub{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.btn-skip-profile{background:transparent;border:none;color:var(--light);font-size:13px;text-decoration:underline;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;padding:10px 0 0;text-align:center;}
+/* Survey prompt after check-in */
+.survey-prompt-box{background:#fff8ed;border:1px solid #f5d99a;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;}
+.survey-prompt-title{font-size:15px;font-weight:700;color:#7a5200;margin-bottom:6px;}
+.survey-prompt-msg{font-size:13px;color:#9a6a00;margin-bottom:12px;line-height:1.5;}
+.btn-take-survey{display:inline-block;background:linear-gradient(135deg,var(--p3),var(--p4));color:white;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Outfit',sans-serif;}
+.btn-skip-survey{background:transparent;border:none;color:var(--light);font-size:13px;text-decoration:underline;cursor:pointer;font-family:'Outfit',sans-serif;display:block;margin:8px auto 0;}
 </style>
 </head>
 <body>
@@ -96,7 +109,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
   <div class="card-header">
     <div class="org-name">The JJ Center, Inc. &middot; Ward 8, DC</div>
     <h1 class="header-title">Welcome! <em>👋</em></h1>
-    <p class="header-sub">Free food pantry &mdash; please check in below</p>
+    <p class="header-sub">Free food pantry, please check in below</p>
   </div>
 
   <div class="choice-bar">
@@ -141,7 +154,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
           <div class="fg">
             <label>Email <span style="color:rgba(196,168,245,.4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
             <input type="email" id="w-email" placeholder="your@email.com" autocomplete="email">
-            <div class="fg-note">Only needed if you want a free account with us. This form is otherwise anonymous.</div>
+            <div class="fg-note">Add your email and we will set up your account. Next time it is one tap and you will never fill this out again.</div>
           </div>
           <button class="btn-main" id="btn-walkin-ci" onclick="walkInContinue()">
             <span>Continue</span><div class="spin"></div>
@@ -156,7 +169,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 
     <!-- MEMBER QR SCAN SUCCESS (staff scanned member QR) -->
     <div class="success-view" id="qr-success">
-      <span class="suc-icon" id="qr-icon">✅</span>
+      <span class="suc-icon" id="qr-icon">&#x2705;</span>
       <div class="suc-badge" id="qr-badge" style="background:rgba(26,122,61,.2);color:#6DEAA0;">Registered Member</div>
       <h2 class="suc-title" id="qr-name"></h2>
       <p class="suc-msg" id="qr-msg"></p>
@@ -165,7 +178,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 
     <!-- NOT IN SYSTEM (invalid QR scan) -->
     <div class="not-found" id="not-found">
-      <span class="nf-icon">⚠️</span>
+      <span class="nf-icon">&#x26A0;&#xFE0F;</span>
       <h2 class="nf-title">Not in our system</h2>
       <p class="nf-msg">This QR code does not match anyone in the JJ Center member system.</p>
       <div class="nf-box">
@@ -181,10 +194,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;displ
 
     <!-- STANDARD SUCCESS VIEW -->
     <div class="success-view" id="success-view">
-      <span class="suc-icon" id="success-icon">✅</span>
+      <span class="suc-icon" id="success-icon">&#x2705;</span>
       <h2 class="suc-title" id="success-title"></h2>
       <p class="suc-msg" id="success-msg"></p>
       <div class="suc-detail" id="success-detail"></div>
+      <div id="success-survey-prompt" style="display:none;"></div>
     </div>
 
     <p class="footer-note">Your information is kept private and secure.<br>We never sell or share your data.</p>
@@ -197,77 +211,15 @@ const SB_URL = 'https://mkldikwqxninqcmorwsg.supabase.co';
 const SB_KEY = 'sb_publishable_sL0EK7R10PR9Pi5O9vmIvQ_LpmwZhYJ';
 const sb     = window.supabase.createClient(SB_URL, SB_KEY);
 
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 // ══════════════════════════════════════════════
-// STAFF QR SCAN — runs immediately if ?mid= in URL
-// Staff points phone camera at member's QR code
-// Phone opens this page with member ID in URL
-// We look them up and show their name
+// STAFF QR SCAN
 // ══════════════════════════════════════════════
 const params = new URLSearchParams(location.search);
 const midFromQR = params.get('mid');
 
-// Check if already signed in — skip the form for members
-(async () => {
-  if (midFromQR) return; // QR scan flow takes precedence
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
-    // Load member profile
-    const { data: member } = await sb.from('members')
-      .select('first_name,last_name,email,zip_code,household_size')
-      .eq('id', session.user.id).single();
-    const fname = member?.first_name || session.user.user_metadata?.first_name || 'Friend';
-    const lname = member?.last_name || session.user.user_metadata?.last_name || '';
-    const email = member?.email || session.user.email || '';
-    // Hide normal UI
-    document.querySelector('.choice-bar').style.display = 'none';
-    document.getElementById('main-view').innerHTML = `
-      <div style="text-align:center;padding:16px 0;">
-        <div style="font-size:52px;margin-bottom:14px;">👋</div>
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--p2);margin-bottom:8px;">Welcome back, ${escHtml(fname)}!</h2>
-        <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px;">Tap the button below to log your visit today.</p>
-        <button class="btn-main" id="btn-member-auto" onclick="autoMemberCheckIn()" style="max-width:260px;margin:0 auto;">
-          <span>Check In Now</span><div class="spin"></div>
-        </button>
-      </div>`;
-    document.getElementById('main-view').style.display = 'block';
-    // Store for use in autoMemberCheckIn
-    window._autoMember = { session, fname, lname, email };
-  } catch(_){}
-})();
-
-async function autoMemberCheckIn() {
-  if (!window._autoMember) return;
-  const { session, fname, lname, email } = window._autoMember;
-  setLoading('btn-member-auto', true);
-  try {
-    const { error } = await sb.from('visits').insert({
-      member_id:     session.user.id,
-      visitor_name:  (fname + ' ' + lname).trim(),
-      visitor_email: email || null,
-      visited_at:    new Date().toISOString(),
-      visit_type:    'Member Check-In',
-      source:        'web'
-    });
-    if (error) throw error;
-    document.getElementById('main-view').style.display = 'none';
-    document.getElementById('success-view').style.display = 'block';
-    document.getElementById('success-icon').textContent = '✅';
-    document.getElementById('success-title').textContent = fname + ' is checked in!';
-    document.getElementById('success-msg').textContent = 'Welcome back! Your visit has been logged.';
-    const now = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    const today = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-    document.getElementById('success-detail').innerHTML = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now;
-  } catch(err) {
-    setLoading('btn-member-auto', false);
-    showErr('Something went wrong. Please ask staff for help.');
-  }
-}
-
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 if (midFromQR) {
-  // Hide the normal check-in UI immediately
   document.querySelector('.choice-bar').style.display = 'none';
   document.getElementById('main-view').style.display  = 'none';
   handleStaffQRScan(midFromQR);
@@ -275,19 +227,9 @@ if (midFromQR) {
 
 async function handleStaffQRScan(memberId) {
   try {
-    // Look up the member by ID via RPC — row-level security limits direct
-    // table reads to a member's own row, so staff (not signed in as them)
-    // need this security-definer function to find them by id from the QR code.
     const { data: rows, error } = await sb.rpc('checkin_lookup_member', { p_member_id: memberId });
     const member = rows && rows[0];
-
-    if (error || !member) {
-      // Not in our system
-      showNotFound();
-      return;
-    }
-
-    // Valid member — log the visit
+    if (error || !member) { showNotFound(); return; }
     await sb.from('visits').insert({
       member_id:     member.id,
       visitor_name:  (member.first_name + ' ' + member.last_name).trim(),
@@ -296,12 +238,8 @@ async function handleStaffQRScan(memberId) {
       visit_type:    'Staff QR Scan',
       source:        'staff_scan'
     });
-
-    // Show success with their name
     showQRSuccess(member);
-
   } catch (err) {
-    console.error('QR scan error:', err);
     showNotFound();
   }
 }
@@ -310,7 +248,6 @@ function showQRSuccess(member) {
   const now   = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const name  = member.first_name || 'Member';
-
   document.getElementById('qr-success').style.display = 'block';
   document.getElementById('qr-icon').textContent       = '✅';
   document.getElementById('qr-name').textContent       = name + ' is checked in!';
@@ -321,17 +258,182 @@ function showQRSuccess(member) {
     new Date(member.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
-function showNotFound() {
-  document.getElementById('not-found').style.display = 'block';
+function showNotFound() { document.getElementById('not-found').style.display = 'block'; }
+
+function resetPage() { window.location.href = location.pathname; }
+
+// ══════════════════════════════════════════════
+// AUTO-MEMBER FLOW (already signed in)
+// ══════════════════════════════════════════════
+(async () => {
+  if (midFromQR) return;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+
+    // Load member profile + profile config in parallel
+    const [memberRes, configRes, surveyRes] = await Promise.all([
+      sb.from('members').select('first_name,last_name,email,zip_code,household_size,profile_version,survey_done_version').eq('id', session.user.id).single(),
+      sb.from('app_config').select('value').eq('key','current_profile_version').single(),
+      sb.from('survey_versions').select('version').eq('is_active',true).eq('survey_type','community').single()
+    ]);
+
+    const member = memberRes.data;
+    const currentProfileVer = parseInt(configRes.data?.value || '1', 10);
+    window._activeSurveyVersion = surveyRes.data?.version || null;
+
+    const fname = member?.first_name || session.user.user_metadata?.first_name || '';
+    const lname = member?.last_name  || session.user.user_metadata?.last_name  || '';
+    const email = member?.email      || session.user.email || '';
+
+    const profileNeedsUpdate = !member?.profile_version || member.profile_version < currentProfileVer
+      || !member?.zip_code || !member?.household_size;
+
+    window._autoMember = { session, member, fname, lname, email, currentProfileVer };
+
+    document.querySelector('.choice-bar').style.display = 'none';
+
+    if (profileNeedsUpdate) {
+      document.getElementById('main-view').innerHTML = buildAutoProfileCard(fname, member);
+    } else {
+      document.getElementById('main-view').innerHTML = buildAutoCheckInCard(fname);
+    }
+    document.getElementById('main-view').style.display = 'block';
+  } catch(_){}
+})();
+
+function buildAutoCheckInCard(fname) {
+  return `<div style="text-align:center;padding:16px 0;">
+    <div style="font-size:52px;margin-bottom:14px;">👋</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--p2);margin-bottom:8px;">Welcome back, ${escHtml(fname || 'Friend')}!</h2>
+    <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px;">Tap the button below to log your visit today.</p>
+    <button class="btn-main" id="btn-member-auto" onclick="doAutoCheckIn()" style="max-width:260px;margin:0 auto;">
+      <span>Check In Now</span><div class="spin"></div>
+    </button>
+  </div>`;
 }
 
-function resetPage() {
-  // Remove mid from URL and reload clean
-  window.location.href = location.pathname;
+function buildAutoProfileCard(fname, member) {
+  return `<div style="padding:4px 0;">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--p2);margin-bottom:6px;">Welcome back, ${escHtml(fname || 'Friend')}!</h2>
+    <div class="profile-upd-card">
+      <div class="profile-upd-title">Quick profile update</div>
+      <div class="profile-upd-sub">Help us serve you better by confirming a couple of details.</div>
+      <div class="fg"><label>ZIP Code</label><input type="text" id="auto-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5" value="${escHtml(member?.zip_code||'')}"></div>
+      <div class="fg">
+        <label>Household Size</label>
+        <select id="auto-household">
+          <option value="" ${!member?.household_size?'selected':''}>Select...</option>
+          <option value="1" ${member?.household_size==='1'?'selected':''}>1 person</option>
+          <option value="2" ${member?.household_size==='2'?'selected':''}>2 people</option>
+          <option value="3-4" ${member?.household_size==='3-4'?'selected':''}>3&ndash;4 people</option>
+          <option value="5-6" ${member?.household_size==='5-6'?'selected':''}>5&ndash;6 people</option>
+          <option value="7+" ${member?.household_size==='7+'?'selected':''}>7+ people</option>
+        </select>
+      </div>
+      <button class="btn-main" id="btn-auto-save" onclick="saveProfileAndCheckIn()"><span>Save &amp; Check In</span><div class="spin"></div></button>
+      <button class="btn-skip-profile" onclick="skipProfileAndCheckIn()">Skip for now</button>
+    </div>
+  </div>`;
+}
+
+async function doAutoCheckIn() {
+  if (!window._autoMember) return;
+  const { session, fname, lname, email } = window._autoMember;
+  setLoading('btn-member-auto', true);
+  try {
+    await sb.from('visits').insert({
+      member_id:     session.user.id,
+      visitor_name:  (fname + ' ' + lname).trim() || null,
+      visitor_email: email || null,
+      visited_at:    new Date().toISOString(),
+      visit_type:    'Member Check-In',
+      source:        'web'
+    });
+    showMemberSuccess(fname, session.user.id);
+  } catch(err) {
+    setLoading('btn-member-auto', false);
+    showErr('Something went wrong. Please ask staff for help.');
+  }
+}
+
+async function saveProfileAndCheckIn() {
+  if (!window._autoMember) return;
+  const { session, fname, lname, email, currentProfileVer } = window._autoMember;
+  setLoading('btn-auto-save', true);
+  try {
+    const zip = document.getElementById('auto-zip')?.value.trim() || null;
+    const hh  = document.getElementById('auto-household')?.value || null;
+    await sb.from('members').update({
+      zip_code: zip, household_size: hh,
+      profile_version: currentProfileVer,
+      updated_at: new Date().toISOString()
+    }).eq('id', session.user.id);
+  } catch(_){}
+  try {
+    await sb.from('visits').insert({
+      member_id: session.user.id,
+      visitor_name: (fname + ' ' + lname).trim() || null,
+      visitor_email: email || null,
+      visited_at: new Date().toISOString(),
+      visit_type: 'Member Check-In',
+      source: 'web'
+    });
+  } catch(_){}
+  showMemberSuccess(fname, session.user.id);
+}
+
+async function skipProfileAndCheckIn() {
+  if (!window._autoMember) return;
+  const { session, fname, lname, email } = window._autoMember;
+  try {
+    await sb.from('visits').insert({
+      member_id: session.user.id,
+      visitor_name: (fname + ' ' + lname).trim() || null,
+      visitor_email: email || null,
+      visited_at: new Date().toISOString(),
+      visit_type: 'Member Check-In',
+      source: 'web'
+    });
+  } catch(_){}
+  showMemberSuccess(fname, session.user.id);
+}
+
+function showMemberSuccess(fname, userId) {
+  document.getElementById('main-view').style.display = 'none';
+  document.getElementById('success-view').style.display = 'block';
+  document.getElementById('success-icon').textContent = '✅';
+  document.getElementById('success-title').textContent = (fname || 'You') + ' is checked in!';
+  document.getElementById('success-msg').textContent = 'Welcome back! Your visit has been logged.';
+  const now   = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const today = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('success-detail').innerHTML = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now;
+  maybeShowMemberSurveyPrompt(userId);
+}
+
+async function maybeShowMemberSurveyPrompt(userId) {
+  try {
+    const sv = window._activeSurveyVersion;
+    if (!sv) return;
+    // Check localStorage first
+    try { if (localStorage.getItem('jj_survey_done_v' + sv)) return; } catch(_){}
+    // Check DB
+    const { data: m } = await sb.from('members').select('survey_done_version').eq('id', userId).single();
+    if (m && m.survey_done_version && m.survey_done_version >= sv) return;
+    // Show prompt
+    document.getElementById('success-survey-prompt').innerHTML =
+      `<div class="survey-prompt-box">
+        <div class="survey-prompt-title">Help us serve you better</div>
+        <div class="survey-prompt-msg">Take our short anonymous survey. It only takes a few minutes and helps us improve for everyone.</div>
+        <a href="survey.html?source=account" class="btn-take-survey">Take the Survey &rarr;</a>
+        <button class="btn-skip-survey" onclick="document.getElementById('success-survey-prompt').style.display='none'">Skip</button>
+      </div>`;
+    document.getElementById('success-survey-prompt').style.display = 'block';
+  } catch(_){}
 }
 
 // ══════════════════════════════════════════════
-// STANDARD CHECK-IN FLOWS (member self sign-in + walk-ins)
+// STANDARD CHECK-IN FLOWS
 // ══════════════════════════════════════════════
 function switchPane(pane) {
   document.querySelectorAll('.choice-btn').forEach((b,i) =>
@@ -343,6 +445,7 @@ function switchPane(pane) {
 
 function setLoading(id, on) {
   const b = document.getElementById(id);
+  if (!b) return;
   b.disabled = on;
   b.classList.toggle('ld', on);
 }
@@ -353,7 +456,7 @@ function showErr(msg) {
   el.textContent = msg;
 }
 
-// MEMBER SELF CHECK-IN
+// MEMBER SIGN-IN CHECK-IN
 async function memberCheckIn() {
   const email = document.getElementById('m-email').value.trim();
   const pw    = document.getElementById('m-pw').value;
@@ -364,33 +467,115 @@ async function memberCheckIn() {
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
     if (error) throw error;
-    const fname = data.user.user_metadata?.first_name || 'Friend';
+
+    const fname = data.user.user_metadata?.first_name || '';
     const lname = data.user.user_metadata?.last_name  || '';
+
+    // Check if profile needs update
+    let profileNeedsUpdate = false;
+    let member = null;
+    let currentProfileVer = 1;
+    try {
+      const [mRes, cRes] = await Promise.all([
+        sb.from('members').select('zip_code,household_size,profile_version,survey_done_version').eq('id',data.user.id).single(),
+        sb.from('app_config').select('value').eq('key','current_profile_version').single()
+      ]);
+      member = mRes.data;
+      currentProfileVer = parseInt(cRes.data?.value || '1', 10);
+      profileNeedsUpdate = !member?.profile_version || member.profile_version < currentProfileVer
+        || !member?.zip_code || !member?.household_size;
+    } catch(_){}
+
+    window._memberSignIn = { user: data.user, fname, lname, email, member, currentProfileVer };
+
+    if (profileNeedsUpdate) {
+      // Show profile update card in-place
+      document.getElementById('pnl-member').innerHTML = buildMemberProfileCard(fname, member);
+      setLoading('btn-member-ci', false);
+    } else {
+      await completeMemberCheckIn();
+    }
+  } catch (err) {
+    showErr(err.message?.includes('Invalid') ? 'Incorrect email or password.' : err.message);
+    setLoading('btn-member-ci', false);
+  }
+}
+
+function buildMemberProfileCard(fname, member) {
+  return `<div class="profile-upd-card">
+    <div class="profile-upd-title">Quick profile update</div>
+    <div class="profile-upd-sub">Welcome back, ${escHtml(fname || 'Friend')}! Help us serve you better by confirming a couple of details.</div>
+    <div class="fg"><label>ZIP Code</label><input type="text" id="mem-zip" placeholder="e.g. 20032" inputmode="numeric" maxlength="5" value="${escHtml(member?.zip_code||'')}"></div>
+    <div class="fg">
+      <label>Household Size</label>
+      <select id="mem-household">
+        <option value="" ${!member?.household_size?'selected':''}>Select...</option>
+        <option value="1" ${member?.household_size==='1'?'selected':''}>1 person</option>
+        <option value="2" ${member?.household_size==='2'?'selected':''}>2 people</option>
+        <option value="3-4" ${member?.household_size==='3-4'?'selected':''}>3&ndash;4 people</option>
+        <option value="5-6" ${member?.household_size==='5-6'?'selected':''}>5&ndash;6 people</option>
+        <option value="7+" ${member?.household_size==='7+'?'selected':''}>7+ people</option>
+      </select>
+    </div>
+    <button class="btn-main" id="btn-mem-save" onclick="saveMemberProfileAndCheckIn()"><span>Save &amp; Check In</span><div class="spin"></div></button>
+    <button class="btn-skip-profile" onclick="skipMemberProfileAndCheckIn()">Skip for now</button>
+  </div>`;
+}
+
+async function saveMemberProfileAndCheckIn() {
+  if (!window._memberSignIn) return;
+  const { user, currentProfileVer } = window._memberSignIn;
+  setLoading('btn-mem-save', true);
+  try {
+    const zip = document.getElementById('mem-zip')?.value.trim() || null;
+    const hh  = document.getElementById('mem-household')?.value || null;
+    await sb.from('members').update({
+      zip_code: zip, household_size: hh,
+      profile_version: currentProfileVer,
+      updated_at: new Date().toISOString()
+    }).eq('id', user.id);
+  } catch(_){}
+  await completeMemberCheckIn();
+}
+
+async function skipMemberProfileAndCheckIn() {
+  await completeMemberCheckIn();
+}
+
+async function completeMemberCheckIn() {
+  if (!window._memberSignIn) return;
+  const { user, fname, lname, email } = window._memberSignIn;
+  try {
     await sb.from('visits').insert({
-      member_id:     data.user.id,
-      visitor_name:  (fname + ' ' + lname).trim(),
-      visitor_email: data.user.email || null,
+      member_id:     user.id,
+      visitor_name:  (fname + ' ' + lname).trim() || null,
+      visitor_email: email || null,
       visited_at:    new Date().toISOString(),
       visit_type:    'Member Check-In',
       source:        'web'
     });
-    showSuccess('member', fname, email);
-    await sb.auth.signOut(); // Sign out after check-in — checkin page is not the dashboard
-  } catch (err) {
-    showErr(err.message?.includes('Invalid') ? 'Incorrect email or password.' : err.message);
-  } finally { setLoading('btn-member-ci', false); }
+  } catch(_){}
+  showMemberSuccess(fname, user.id);
+  try { await sb.auth.signOut(); } catch(_){}
 }
+
+// ══════════════════════════════════════════════
+// WALK-IN FLOW
+// ══════════════════════════════════════════════
 
 // Load survey on page load
 window._activeSurvey = null;
 (async () => {
   try {
-    const { data: sv } = await sb.from('survey_versions').select('*').eq('is_active', true).single();
-    if (sv) window._activeSurvey = sv;
+    const { data: sv } = await sb.from('survey_versions')
+      .select('*').eq('is_active', true).eq('survey_type','community').single();
+    if (sv) {
+      window._activeSurvey = sv;
+      window._activeSurveyVersion = sv.version;
+    }
   } catch(_){}
 })();
 
-// WALK-IN STEP 1 — validate and proceed to survey or submit
 function walkInContinue() {
   const zip       = document.getElementById('w-zip').value.trim();
   const household = document.getElementById('w-household').value;
@@ -414,12 +599,17 @@ function renderWalkInSurvey(sv) {
   html += '<div class="sv-intro-box">' + escHtml(sv.intro_text) + '</div>';
 
   (sv.questions || []).forEach((q, idx) => {
-    const cond = q.conditional ? ' sv-cond" data-cond-dep="' + escHtml(q.conditional.depends_on) + '" data-cond-val="' + escHtml(q.conditional.show_when) + '"' : '"';
-    html += '<div class="sv-q' + (q.conditional ? ' sv-cond' : '') + '" id="svq-' + escHtml(q.id) + '"'
-      + (q.conditional ? ' data-cond-dep="' + escHtml(q.conditional.depends_on) + '" data-cond-val="' + escHtml(q.conditional.show_when) + '"' : '') + '>';
+    const isCond = !!q.conditional;
+    html += '<div class="sv-q' + (isCond ? ' sv-cond' : '') + '" id="svq-' + escHtml(q.id) + '"'
+      + (isCond ? ' data-cond-dep="' + escHtml(q.conditional.depends_on) + '" data-cond-val="' + escHtml(q.conditional.show_when) + '"' : '') + '>';
     html += '<div class="sv-q-label">' + (idx+1) + '. ' + escHtml(q.text) + '</div>';
 
-    if (q.type === 'single_choice') {
+    if (q.type === 'dropdown') {
+      html += '<select class="sv-select" onchange="svDropdownAnswer(\'' + escHtml(q.id) + '\',this.value)">'
+        + '<option value="">Select...</option>'
+        + (q.options||[]).map(opt => '<option value="' + escHtml(opt) + '">' + escHtml(opt) + '</option>').join('')
+        + '</select>';
+    } else if (q.type === 'single_choice') {
       html += '<div class="sv-opts">';
       q.options.forEach(opt => {
         html += '<label class="sv-opt" onclick="svPickSingle(this,\'' + escHtml(q.id) + '\',\'' + escHtml(opt) + '\')">'
@@ -441,6 +631,7 @@ function renderWalkInSurvey(sv) {
       const sc = q.scale || {min:1,max:5,labels:['Poor','Excellent']};
       const nums = [];
       for (let i = sc.min; i <= sc.max; i++) nums.push(i);
+      const hasNS = !!q.not_sure_col;
       html += '<div class="sv-grid"><table><thead><tr><th class="rl"></th>';
       nums.forEach((n, i) => {
         let lbl = n;
@@ -448,6 +639,7 @@ function renderWalkInSurvey(sv) {
         if (i === nums.length-1 && sc.labels?.[1]) lbl = n + '<br><small style="font-weight:400;color:#999">' + escHtml(sc.labels[1]) + '</small>';
         html += '<th>' + lbl + '</th>';
       });
+      if (hasNS) html += '<th style="font-size:10px;color:#aaa;">Not sure</th>';
       html += '</tr></thead><tbody>';
       (q.rows||[]).forEach(row => {
         html += '<tr><td class="rl">' + escHtml(row) + '</td>';
@@ -455,6 +647,10 @@ function renderWalkInSurvey(sv) {
           html += '<td><input type="radio" name="svgrid_' + escHtml(q.id) + '_' + escHtml(row) + '" value="' + n
             + '" onchange="svGridAnswer(\'' + escHtml(q.id) + '\',\'' + escHtml(row) + '\',' + n + ')"></td>';
         });
+        if (hasNS) {
+          html += '<td><input type="radio" name="svgrid_' + escHtml(q.id) + '_' + escHtml(row) + '" value="not_sure"'
+            + ' onchange="svGridAnswer(\'' + escHtml(q.id) + '\',\'' + escHtml(row) + '\',\'not_sure\')"></td>';
+        }
         html += '</tr>';
       });
       html += '</tbody></table></div>';
@@ -464,10 +660,33 @@ function renderWalkInSurvey(sv) {
     html += '</div>';
   });
 
+  // Q12: email field — only shown if no email was given in step 1
+  const step1Email = document.getElementById('w-email')?.value.trim() || '';
+  if (!step1Email) {
+    html += '<div class="sv-q" id="svq-q12">'
+      + '<div class="sv-q-label">Want to skip this form next time?</div>'
+      + '<input type="email" id="sv-q12-email" placeholder="your@email.com" autocomplete="email" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:\'Outfit\',sans-serif;color:var(--ink);background:#fff;" oninput="window._q12Email=this.value.trim()">'
+      + '<div style="font-size:12px;color:var(--light);margin-top:5px;">Add your email and we will set up your account. Next time it is one tap and you will never fill this out again.</div>'
+      + '</div>';
+  }
+
   html += '<button class="btn-main" id="btn-sv-submit" onclick="walkInCheckIn(window._svAnswers,false)" style="margin-top:8px;"><span>Submit</span><div class="spin"></div></button>';
 
   step2.innerHTML = html;
   step2.style.display = 'block';
+  window._q12Email = '';
+}
+
+function svDropdownAnswer(qid, val) {
+  window._svAnswers[qid] = val || undefined;
+  if (!val) delete window._svAnswers[qid];
+  // Handle conditionals
+  document.querySelectorAll('#walkin-step2 .sv-cond').forEach(el => {
+    if (el.dataset.condDep === qid) {
+      el.style.display = (val === el.dataset.condVal) ? 'block' : 'none';
+      if (val !== el.dataset.condVal) delete window._svAnswers[el.id.replace('svq-','')];
+    }
+  });
 }
 
 function svPickSingle(label, qid, val) {
@@ -475,7 +694,6 @@ function svPickSingle(label, qid, val) {
   list.querySelectorAll('.sv-opt').forEach(el => el.classList.remove('sel'));
   label.classList.add('sel');
   window._svAnswers[qid] = val;
-  // Conditionals
   document.querySelectorAll('#walkin-step2 .sv-cond').forEach(el => {
     if (el.dataset.condDep === qid) {
       el.style.display = (val === el.dataset.condVal) ? 'block' : 'none';
@@ -505,67 +723,82 @@ function svTextAnswer(qid, val) {
   else delete window._svAnswers[qid];
 }
 
-// WALK-IN CHECK-IN — called after survey step or directly on skip
+// WALK-IN CHECK-IN — submit visit + survey, trigger invite if Q12 email given
 async function walkInCheckIn(surveyAnswers, skipped) {
   const zip       = document.getElementById('w-zip').value.trim();
   const household = document.getElementById('w-household').value;
-  const email     = document.getElementById('w-email').value.trim();
+  const step1Email = document.getElementById('w-email')?.value.trim() || '';
+  const q12Email   = window._q12Email || '';
+  const finalEmail = step1Email || q12Email || null;
+
   const submitBtn = document.getElementById('btn-sv-submit') || document.getElementById('btn-walkin-ci');
   if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('ld'); }
   document.getElementById('ci-alert').className = 'alert';
+
+  // Log visit (never block on this)
   try {
-    const { error: visitErr } = await sb.from('visits').insert({
+    await sb.from('visits').insert({
       member_id:      null,
       visitor_zip:    zip,
-      visitor_email:  email || null,
+      visitor_email:  finalEmail,
       household_size: household,
       visited_at:     new Date().toISOString(),
       visit_type:     'Walk-In',
       source:         'checkin_form'
     });
-    if (visitErr) throw visitErr;
-    // Save survey response if not skipped and answers exist
-    if (!skipped && surveyAnswers && window._activeSurvey && Object.keys(surveyAnswers).length > 0) {
-      try {
-        await sb.from('survey_responses').insert({
-          survey_version: window._activeSurvey.version,
-          answers: surveyAnswers,
-          source: 'checkin'
-        });
-        try { localStorage.setItem('jj_survey_done_v' + window._activeSurvey.version, '1'); } catch(_){}
-      } catch(_){}
-    }
-    showSuccess('walkin', name, email);
-  } catch (err) {
-    showErr('Something went wrong — please ask staff for help.');
-    console.error(err);
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('ld'); }
+  } catch(err) {
+    // Fail silently — don't block show of success
   }
+
+  // Save survey response (fail silently)
+  if (!skipped && surveyAnswers && window._activeSurvey && Object.keys(surveyAnswers).length > 0) {
+    try {
+      await sb.from('survey_responses').insert({
+        survey_version: window._activeSurvey.version,
+        answers:        surveyAnswers,
+        source:         'checkin',
+        survey_type:    window._activeSurvey.survey_type || 'community'
+      });
+      try { localStorage.setItem('jj_survey_done_v' + window._activeSurvey.version, '1'); } catch(_){}
+    } catch(_){}
+  }
+
+  // Trigger invite if Q12 email was provided (not step 1 email — that's handled by invite-walkin-user edge fn)
+  if (q12Email && !step1Email) {
+    try {
+      await fetch(SB_URL + '/functions/v1/invite-walkin-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
+        body: JSON.stringify({ visitor_email: q12Email, visit_date: new Date().toISOString().split('T')[0] })
+      });
+    } catch(_){}
+  } else if (step1Email) {
+    // Also trigger invite for step 1 email (fail silently)
+    try {
+      await fetch(SB_URL + '/functions/v1/invite-walkin-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
+        body: JSON.stringify({ visitor_email: step1Email, visit_date: new Date().toISOString().split('T')[0] })
+      });
+    } catch(_){}
+  }
+
+  showWalkInSuccess(finalEmail, household);
 }
 
-// SUCCESS DISPLAY
-function showSuccess(type, name, email) {
+function showWalkInSuccess(email, household) {
   document.getElementById('main-view').style.display   = 'none';
   document.getElementById('success-view').style.display = 'block';
   const now   = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const icon  = document.getElementById('success-icon');
-  const title = document.getElementById('success-title');
-  const msg   = document.getElementById('success-msg');
-  const det   = document.getElementById('success-detail');
-  if (type === 'member') {
-    icon.textContent  = '✅';
-    title.textContent = name + ' is checked in!';
-    msg.textContent   = 'Welcome back, ' + name + '! Your visit has been logged.';
-    det.innerHTML     = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now;
-  } else {
-    icon.textContent  = '🎉';
-    title.textContent = 'Welcome, ' + name + '!';
-    msg.textContent   = email
-      ? 'Your visit is logged. Check your inbox — we\'ll send you a link to create your free JJ Center account.'
-      : 'Your visit is logged. Thank you for being part of the JJ Center community!';
-    det.innerHTML = '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>' + today + ' at ' + now + ' &middot; Household: ' + (document.getElementById('w-household')?.value || '');
-  }
+  document.getElementById('success-icon').textContent  = '🎉';
+  document.getElementById('success-title').textContent = 'You are checked in!';
+  document.getElementById('success-msg').textContent   = email
+    ? 'Your visit is logged. Check your inbox, we will send you a link to create your free JJ Center account.'
+    : 'Your visit is logged. Thank you for being part of the JJ Center community!';
+  document.getElementById('success-detail').innerHTML  =
+    '<strong style="color:var(--p2);display:block;margin-bottom:4px;">Visit Logged</strong>'
+    + today + ' at ' + now + (household ? ' &middot; Household: ' + escHtml(household) : '');
 }
 
 // Enter key

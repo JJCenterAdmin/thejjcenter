@@ -42,6 +42,11 @@ body{background:var(--p1);color:#e8e0f4;padding-bottom:60px;}
 .opt-item input{width:16px;height:16px;accent-color:var(--p5);flex-shrink:0;cursor:pointer;}
 .opt-item span{font-size:14px;color:#d8ccf0;}
 
+/* DROPDOWN */
+.q-select{width:100%;padding:13px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(196,168,245,.2);border-radius:10px;color:#e8e0f4;font-family:var(--sans);font-size:14px;transition:border-color .2s;appearance:none;}
+.q-select:focus{outline:none;border-color:var(--p5);}
+.q-select option{background:#2a1052;color:#e8e0f4;}
+
 /* RATING GRID */
 .rating-grid{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .rating-table{width:100%;border-collapse:collapse;min-width:320px;}
@@ -130,6 +135,7 @@ async function init() {
       .from('survey_versions')
       .select('*')
       .eq('is_active', true)
+      .eq('survey_type', 'community')
       .single();
 
     if (error || !sv) { showThankYou(); return; }
@@ -167,7 +173,12 @@ function renderSurvey(sv) {
 
     let inner = `<div class="q-label">${idx + 1}. ${esc(q.text)}</div>`;
 
-    if (q.type === 'single_choice') {
+    if (q.type === 'dropdown') {
+      inner += `<select class="q-select" onchange="onDropdownAnswer('${esc(q.id)}',this.value)">
+        <option value="">Select...</option>
+        ${(q.options||[]).map(opt => `<option value="${esc(opt)}">${esc(opt)}</option>`).join('')}
+      </select>`;
+    } else if (q.type === 'single_choice') {
       inner += `<div class="opt-list">` +
         q.options.map(opt =>
           `<label class="opt-item" onclick="selectOpt(this,'${esc(q.id)}','single')">
@@ -190,6 +201,7 @@ function renderSurvey(sv) {
       const scale = q.scale || {min:1,max:5,labels:['Poor','Excellent']};
       const nums = [];
       for (let i = scale.min; i <= scale.max; i++) nums.push(i);
+      const hasNS = !!q.not_sure_col;
       inner += `<div class="rating-grid"><table class="rating-table">
         <thead><tr>
           <th class="row-label-h"></th>
@@ -199,6 +211,7 @@ function renderSurvey(sv) {
             if (i === nums.length-1 && scale.labels?.[1]) lbl = `${n}<br><small style="font-weight:400;color:rgba(196,168,245,.4)">${esc(scale.labels[1])}</small>`;
             return `<th>${lbl}</th>`;
           }).join('')}
+          ${hasNS ? '<th style="font-size:10px;color:rgba(196,168,245,.4);">Not sure</th>' : ''}
         </tr></thead>
         <tbody>` +
         (q.rows||[]).map(row =>
@@ -207,6 +220,7 @@ function renderSurvey(sv) {
             ${nums.map(n =>
               `<td><input type="radio" class="rating-radio" name="qgrid_${esc(q.id)}_${esc(row)}" value="${n}" onchange="onGridAnswer('${esc(q.id)}','${esc(row)}',${n})"></td>`
             ).join('')}
+            ${hasNS ? `<td><input type="radio" class="rating-radio" name="qgrid_${esc(q.id)}_${esc(row)}" value="not_sure" onchange="onGridAnswer('${esc(q.id)}','${esc(row)}','not_sure')"></td>` : ''}
           </tr>`
         ).join('') +
         `</tbody></table></div>`;
@@ -246,9 +260,14 @@ function selectOpt(label, qid, type, maxSel) {
   }
 }
 
+function onDropdownAnswer(qid, val) {
+  if (val) answers[qid] = val;
+  else delete answers[qid];
+  checkConditionals(qid, val);
+}
+
 function onAnswer(qid, val) {
   answers[qid] = val;
-  // Handle conditional display
   checkConditionals(qid, val);
 }
 
@@ -286,7 +305,8 @@ async function submitSurvey() {
     await sb.from('survey_responses').insert({
       survey_version: surveyVersion,
       answers: answers,
-      source: source
+      source: source,
+      survey_type: 'community'
     });
     try { localStorage.setItem('jj_survey_done_v' + surveyVersion, '1'); } catch(_){}
     // Update members table if signed in
@@ -321,14 +341,13 @@ function skipSurvey() {
   }
 }
 
-// Store questions globally for conditional checks after render
-const _origInit = init;
 async function initWithStore() {
   try {
     const { data: sv, error } = await sb
       .from('survey_versions')
       .select('*')
       .eq('is_active', true)
+      .eq('survey_type', 'community')
       .single();
 
     if (error || !sv) { showThankYou(); return; }
